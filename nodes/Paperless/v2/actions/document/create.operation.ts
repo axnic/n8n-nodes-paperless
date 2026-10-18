@@ -1,4 +1,4 @@
-import { IDataObject, IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
+import { IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
 import { apiRequest } from '../../transport';
 
 export const description: INodeProperties[] = [
@@ -181,19 +181,14 @@ export async function execute(
 
 	const binaryPropertyName = this.getNodeParameter('binary_property_name', itemIndex) as string;
 	const binaryData = this.helpers.assertBinaryData(itemIndex, binaryPropertyName);
-	const data = binaryData.id
-		? await this.helpers.getBinaryStream(binaryData.id)
-		: Buffer.from(binaryData.data, 'base64');
+	const data = await this.helpers.getBinaryDataBuffer(itemIndex, binaryPropertyName);
 
-	const formData: IDataObject = {
-		document: {
-			value: data,
-			options: {
-				filename: binaryData.fileName,
-				contentType: binaryData.mimeType,
-			},
-		},
-	};
+	const formData = new FormData();
+	formData.append(
+		'document',
+		new Blob([new Uint8Array(data)], { type: binaryData.mimeType }),
+		binaryData.fileName,
+	);
 
 	const additionalFields = this.getNodeParameter('additional_fields', itemIndex) as any;
 	Object.entries({
@@ -206,7 +201,7 @@ export async function execute(
 	})
 		.filter(([, value]) => value !== undefined && value !== '')
 		.forEach(([key, value]) => {
-			formData[key] = String(value);
+			formData.append(key, String(value));
 		});
 
 	const response = (await apiRequest.call(
@@ -216,7 +211,7 @@ export async function execute(
 		endpoint,
 		undefined,
 		undefined,
-		{ formData },
+		{ body: formData },
 	)) as any;
 
 	return { json: { results: [response] } };

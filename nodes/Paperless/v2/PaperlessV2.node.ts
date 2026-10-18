@@ -10,6 +10,8 @@ import { router } from './actions/router';
 import * as version from './actions/version';
 import { listSearch } from './methods';
 
+// The icon comes from the description built in the constructor (versioned node).
+// eslint-disable-next-line @n8n/community-nodes/icon-validation
 export class PaperlessV2 implements INodeType {
 	description: INodeTypeDescription;
 
@@ -17,6 +19,7 @@ export class PaperlessV2 implements INodeType {
 		this.description = {
 			...baseDescription,
 			...version.description,
+			icon: 'file:../../icons/paperless-ngx.svg',
 			usableAsTool: true,
 		};
 	}

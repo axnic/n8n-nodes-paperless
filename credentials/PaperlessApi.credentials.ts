@@ -1,7 +1,13 @@
-import { ICredentialType, INodeProperties, IAuthenticateGeneric } from 'n8n-workflow';
+import type {
+	IAuthenticateGeneric,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+} from 'n8n-workflow';
 
 export class PaperlessApi implements ICredentialType {
 	name = 'paperlessApi';
+	icon = 'file:../icons/paperless-ngx.svg' as const;
 	// eslint-disable-next-line n8n-nodes-base/cred-class-field-display-name-miscased
 	displayName = 'Paperless-ngx API';
 	documentationUrl = 'https://docs.paperless-ngx.com/api/#authorization'; // TODO: Create a Wiki page to link to
@@ -30,6 +36,14 @@ export class PaperlessApi implements ICredentialType {
 			headers: {
 				Authorization: '=Token {{$credentials.apiKey}}',
 			},
+		},
+	};
+
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.url}}',
+			url: '/documents/',
+			qs: { page_size: 1 },
 		},
 	};
 }

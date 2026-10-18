@@ -36,7 +36,7 @@ function crud(resource, extra = {}) {
 
 		it('removes', async () => {
 			await run(resource, 'remove', { id: id(created.id) });
-			await assert.rejects(run(resource, 'get', { id: id(created.id) }), /404/);
+			await assert.rejects(run(resource, 'get', { id: id(created.id) }), { httpCode: '404' });
 		});
 	});
 }
@@ -145,7 +145,7 @@ describe('Paperless-ngx', () => {
 
 		it('removes', async () => {
 			await run('document', 'remove', { id: id(documentId) });
-			await assert.rejects(run('document', 'get', { id: id(documentId) }), /404/);
+			await assert.rejects(run('document', 'get', { id: id(documentId) }), { httpCode: '404' });
 		});
 	});
 });

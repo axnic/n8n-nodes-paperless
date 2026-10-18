@@ -1,6 +1,9 @@
 // Runs the compiled node against a real Paperless-ngx: a minimal stand-in for the IExecuteFunctions
-// n8n gives to a node, with the HTTP helpers backed by fetch. Needs `pnpm build` first.
+// n8n gives to a node, with the HTTP helper backed by fetch. Needs `pnpm build` first.
+const { NodeApiError } = require('n8n-workflow');
 const { router } = require('../../dist/nodes/Paperless/v2/actions/router');
+
+const NODE = { name: 'Paperless-ngx', type: 'paperless', typeVersion: 2 };
 
 const BASE_URL = (process.env.PAPERLESS_URL ?? 'http://localhost:8000').replace(/\/$/, '');
 const USER = process.env.PAPERLESS_ADMIN_USER ?? 'admin';
@@ -36,26 +39,14 @@ async function fetchToken() {
 	}
 }
 
-function toForm(formData) {
-	const form = new FormData();
-	for (const [key, value] of Object.entries(formData)) {
-		if (value && typeof value === 'object' && 'value' in value) {
-			form.append(key, new Blob([value.value], { type: value.options?.contentType }), value.options?.filename);
-		} else {
-			form.append(key, String(value));
-		}
-	}
-	return form;
-}
-
-async function send(token, options, uri = options.uri) {
-	const url = new URL(uri);
+async function send(token, options) {
+	const url = new URL(options.url);
 	for (const [key, value] of Object.entries(options.qs ?? {})) url.searchParams.set(key, String(value));
 
 	const headers = { Authorization: `Token ${token}`, Accept: 'application/json', ...options.headers };
 	let body;
-	if (options.formData) {
-		body = toForm(options.formData);
+	if (options.body instanceof FormData) {
+		body = options.body;
 	} else if (options.body !== undefined) {
 		headers['Content-Type'] = 'application/json';
 		body = JSON.stringify(options.body);
@@ -71,9 +62,11 @@ async function send(token, options, uri = options.uri) {
 		body: isJson ? JSON.parse(raw.toString() || 'null') : raw,
 	};
 	if (!response.ok) {
-		const error = new Error(`${response.status} - ${raw.toString().slice(0, 500)}`);
-		error.httpCode = String(response.status);
-		throw error;
+		// what n8n's own HTTP helper throws
+		throw new NodeApiError(NODE, {
+			message: `${response.status} - ${raw.toString().slice(0, 500)}`,
+			httpCode: String(response.status),
+		});
 	}
 	return result;
 }
@@ -81,7 +74,7 @@ async function send(token, options, uri = options.uri) {
 /** The stand-in for IExecuteFunctions: `params` are the node parameters, `binary` the input binary data. */
 function createContext(token, params, binary = {}) {
 	return {
-		getNode: () => ({ name: 'Paperless-ngx', type: 'paperless', typeVersion: 2 }),
+		getNode: () => NODE,
 		getInputData: () => [{ json: {} }],
 		getCredentials: async () => ({ url: `${BASE_URL}/api`, apiKey: token }),
 		getNodeParameter(name, _index, fallback) {
@@ -91,24 +84,12 @@ function createContext(token, params, binary = {}) {
 		},
 		logger: { debug() {} },
 		helpers: {
-			async requestWithAuthentication(_credentialType, options) {
+			async httpRequestWithAuthentication(_credentialType, options) {
 				const result = await send(token, options);
-				return options.resolveWithFullResponse ? result : result.body;
-			},
-			async requestWithAuthenticationPaginated(options) {
-				const pages = [];
-				let uri = options.uri;
-				let query = options;
-				do {
-					const page = await send(token, query, uri);
-					pages.push(page);
-					uri = page.body?.next;
-					query = { method: options.method };
-				} while (uri);
-				return pages;
+				return options.returnFullResponse ? result : result.body;
 			},
 			assertBinaryData: (_index, name) => binary[name],
-			getBinaryStream: async (id) => binary[id].data,
+			getBinaryDataBuffer: async (_index, name) => Buffer.from(binary[name].data, 'base64'),
 			prepareBinaryData: async (data, fileName, mimeType) => ({
 				data: Buffer.from(data).toString('base64'),
 				fileName,
