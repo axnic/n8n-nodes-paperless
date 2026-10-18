@@ -75,6 +75,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Options',
 		name: 'options',
+		description: 'Which suggestions to return',
 		default: {},
 		displayOptions: {
 			show: {

@@ -5,6 +5,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Input Binary Field',
 		name: 'binary_property_name',
+		description: 'Name of the binary property holding the file to upload',
 		default: 'data',
 		displayOptions: {
 			show: {
@@ -19,6 +20,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Additional Fields',
 		name: 'additional_fields',
+		description: 'Metadata to set on the new document',
 		type: 'collection',
 		default: {},
 		hint: 'All additional fields are automatically added to the document by Paperless if they are not set',

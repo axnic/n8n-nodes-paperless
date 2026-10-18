@@ -18,7 +18,7 @@ export const description: INodeTypeDescription = {
 	group: ['input'],
 	version: 2,
 	subtitle: '={{ $parameter.operation + ": " + $parameter.resource }}',
-	description: 'Consume documents and metadata from Paperless-ngx API',
+	description: 'Search, read and manage the documents, tags, correspondents, document types, custom fields, notes and tasks of a Paperless-ngx instance',
 	defaults: { name: 'Paperless-ngx' },
 
 	credentials: [{ name: 'paperlessApi', required: true }],

@@ -11,6 +11,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'ID',
 		name: 'id',
+		description: 'ID of the custom field',
 		default: { mode: 'list', value: '' },
 		displayOptions: {
 			show: {
@@ -53,6 +54,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Update Fields',
 		name: 'update_fields',
+		description: 'Fields of the custom field to change; the ones left out are kept as they are',
 		default: {},
 		displayOptions: {
 			show: {
@@ -64,6 +66,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Name',
 				name: 'name',
+				description: 'Name of the custom field',
 				placeholder: 'Name of the custom field',
 				type: 'string',
 				default: '',

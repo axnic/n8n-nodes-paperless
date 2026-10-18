@@ -20,6 +20,7 @@ export const description: INodeProperties[] = [
 				name: 'Create a Document Note',
 				value: 'create',
 				action: 'Create a new document note',
+				description: 'Create a new document note',
 			},
 			{
 				name: 'Delete a Document Note',
@@ -30,6 +31,7 @@ export const description: INodeProperties[] = [
 				name: 'List Document Notes',
 				value: 'list',
 				action: 'List all document notes',
+				description: 'List all document notes',
 			},
 		],
 		type: 'options',

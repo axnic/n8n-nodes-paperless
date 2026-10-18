@@ -10,6 +10,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'ID',
 		name: 'id',
+		description: 'ID of the correspondent',
 		default: { mode: 'list', value: '' },
 		displayOptions: {
 			show: {
@@ -52,6 +53,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Update Fields',
 		name: 'update_fields',
+		description: 'Fields of the correspondent to change; the ones left out are kept as they are',
 		default: {},
 		displayOptions: {
 			show: {
@@ -63,6 +65,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Name',
 				name: 'name',
+				description: 'Name of the correspondent',
 				placeholder: 'Name of the correspondent',
 				type: 'string',
 				default: '',
@@ -70,6 +73,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Matching Algorithm',
 				name: 'matching_algorithm',
+				description: 'How Paperless-ngx automatically assigns documents to this correspondent',
 				default: 6,
 				options: [
 					{ name: 'None: Disable matching', value: 0 },
@@ -85,6 +89,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Matching Expression',
 				name: 'match',
+				description: 'Word, string or regular expression used by the matching algorithm',
 				default: '',
 				placeholder: 'Matching expression to match',
 				type: 'string',

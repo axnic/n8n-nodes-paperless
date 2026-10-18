@@ -6,6 +6,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Name',
 		name: 'name',
+		description: 'Name of the custom field',
 		displayOptions: {
 			show: {
 				resource: ['custom_field'],

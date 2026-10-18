@@ -74,6 +74,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Update Fields',
 		name: 'update_fields',
+		description: 'Fields of the document to change; the ones left out are kept as they are',
 		type: 'collection',
 		default: {},
 		hint: 'All additional fields are automatically added to the document by Paperless if they are not set',

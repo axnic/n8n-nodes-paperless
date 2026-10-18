@@ -10,6 +10,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'ID',
 		name: 'id',
+		description: 'ID of the tag',
 		default: { mode: 'list', value: '' },
 		displayOptions: {
 			show: {

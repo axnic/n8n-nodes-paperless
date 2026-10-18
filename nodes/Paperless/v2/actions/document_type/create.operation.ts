@@ -5,6 +5,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Name',
 		name: 'name',
+		description: 'Name of the document type',
 		displayOptions: {
 			show: {
 				resource: ['document_type'],
@@ -19,6 +20,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Matching Algorithm',
 		name: 'matching_algorithm',
+		description: 'How Paperless-ngx automatically assigns documents to this document type',
 		default: 6,
 		displayOptions: {
 			show: {
@@ -40,6 +42,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Matching Expression',
 		name: 'match',
+		description: 'Word, string or regular expression used by the matching algorithm',
 		default: '',
 		displayOptions: {
 			show: {
