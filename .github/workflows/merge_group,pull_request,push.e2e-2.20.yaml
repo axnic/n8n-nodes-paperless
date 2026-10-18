@@ -33,7 +33,7 @@ jobs:
     # Intentionally not pinned: follows the latest axnic/.github (owner-controlled repo).
     uses: axnic/.github/.github/workflows/e2e.run.yaml@main
     with:
-      version: 2.20
+      version: "2.20"
     secrets: inherit
     permissions:
       contents: read
