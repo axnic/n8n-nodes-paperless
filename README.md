@@ -1,116 +1,71 @@
-<!-- trunk-ignore-all(markdownlint/MD041) -->
-
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
-
 # n8n-nodes-paperless
 
-<!-- trunk-ignore-begin(markdownlint/MD033) -->
-<div align="center">
-	<img 
-		src="https://raw.githubusercontent.com/chezmoi-sh/n8n-nodes-paperless/refs/heads/main/nodes/Paperless/v2/paperless-ngx.svg"
-		alt="Paperless Icon"
-		height="50px"
-	>
-</div>
-<!-- trunk-ignore-end(markdownlint/MD033) -->
+![Paperless-ngx](https://raw.githubusercontent.com/axnic/n8n-nodes-paperless/refs/heads/main/nodes/Paperless/v2/paperless-ngx.svg)
 
-This is a n8n community node. It lets you use [Paperless-ngx](https://docs.paperless-ngx.com/) in your n8n workflows.
+[![QA](https://img.shields.io/github/actions/workflow/status/axnic/n8n-nodes-paperless/merge_group%2Cpull_request%2Cpush.qa.yaml?branch=main&label=QA)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.qa.yaml)
+[![npm](https://img.shields.io/npm/v/%40n8n-chezmoi-sh%2Fn8n-nodes-paperless?label=npm)](https://www.npmjs.com/package/@n8n-chezmoi-sh/n8n-nodes-paperless)
+[![license](https://img.shields.io/github/license/axnic/n8n-nodes-paperless?label=license)](LICENSE.md)
+[![commits](https://img.shields.io/badge/commits-gitsym-blue)](https://github.com/axnic/gitsym)
 
-Paperless-ngx is a document management system that transforms your physical documents into a searchable online archive so you can keep your paper documents, but lose the cabinet.
+An [n8n](https://n8n.io) community node for [Paperless-ngx](https://docs.paperless-ngx.com/): upload documents,
+search them, tag and annotate them from your workflows, without writing a single HTTP request.
 
-[Installation](#installation)  
-[Operations](#operations)  
-[Credentials](#credentials)  
-[Compatibility](#compatibility)  
-[Resources](#resources)
+- **Documents**: upload a file, list and read documents, update their title, tags, correspondent or custom
+  fields, read their metadata and history, download the preview, create share links, add notes.
+- **Everything around them**: tags, correspondents, document types, custom fields, archive serial numbers
+  and the status of consumption tasks.
+- **Tested for real**: every operation runs in CI against five Paperless-ngx releases, from 2.20 to 3.3
+  ([compatibility](#compatibility)).
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+In n8n, go to **Settings > Community Nodes > Install** and enter the package name:
+
+```text
+@n8n-chezmoi-sh/n8n-nodes-paperless
+```
+
+See the [community nodes guide](https://docs.n8n.io/integrations/community-nodes/installation/) for the details,
+including self-hosted instances installing it from the command line.
 
 > [!NOTE]
-> This node requires the `form-data` package for handling multipart/form-data requests. It will be automatically installed as a dependency if not already present in your n8n installation.
+> Uploading a document needs the `form-data` package, which n8n installs along with the node if it is missing.
+
+## Getting started
+
+1. In Paperless-ngx, open **My Profile** and generate an **API Auth Token**.
+2. In n8n, create a **Paperless-ngx API** credential with:
+   - the API URL of your instance, ending with `/api` (for example `https://paperless.example.com/api`);
+   - the token from the first step.
+3. Add a **Paperless-ngx** node to a workflow and pick a resource and an operation.
+
+For example, to file the attachments of incoming emails: an email trigger, then **Document > Create** reading the
+attachment from its binary property, with a title and a correspondent as additional fields. The node returns the id of the
+consumption task, and **Task > Get** tells you when Paperless-ngx has finished with it.
 
 ## Operations
 
-The node supports the following resources and operations:
+| Resource | Operations |
+| --- | --- |
+| Document | Create (upload), Get, List, Update, Delete, Get history, Get metadata, Get metadata suggestions, Get preview, Get share links |
+| Document note | Create, List, Delete |
+| Tag | Create, Get, List, Update, Delete |
+| Correspondent | Create, Get, List, Update, Delete |
+| Document type | Create, Get, List, Update, Delete |
+| Custom field | Create, Get, List, Update, Delete |
+| Task | Get |
+| ASN | Get next ASN |
 
-### ASN (Archival Series Number)
-
-- Get next ASN
-
-### Correspondent
-
-- Create/Update/Delete correspondent
-- Get a correspondent
-- List all correspondents
-
-### Custom Field
-
-- Create/Update/Delete custom field
-- Get a custom field
-- List all custom fields
-
-### Document
-
-- Create/Update/Delete document
-- Get a document
-- Get document history
-- Get document metadata
-- Get metadata suggestions
-- Get document preview
-- Get document share links
-- List all documents
-
-### Document Metadata
-
-- Get metadata suggestions
-
-### Document Note
-
-- Create/Delete document note
-- List document notes
-
-### Document Type
-
-- Create/Update/Delete document type
-- Get a document type
-- List all document types
-
-### Tag
-
-- Create/Update/Delete tag
-- Get a tag
-- List all tags
-
-### Task
-
-- Get a task
-
-## AI Tools
-
-This node can also be used to interact with the [AI tools agent](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/tools-agent/). However, keep in mind that it is currently not officially supported by n8n and needs some changes to the n8n codebase to work. For more details, see [this issue](https://github.com/n8n-io/n8n/issues/12593).
-
-## Credentials
-
-You need to provide the following to authenticate:
-
-- Paperless-ngx instance URL
-- API token
-
-To get your API token:
-
-1. Login to your Paperless-ngx instance
-2. Go to your user settings
-3. Create a new API token
+Every operation returns its data under `results`, so the next node reads `{{ $json.results[0] }}` for a single
+object and `{{ $json.results }}` for a list.
 
 ## Compatibility
 
 Built against `n8n-workflow` 2.16, for n8n 2.x. It needs Node.js 22 or later.
 
-Every operation of the node is tested against a real Paperless-ngx (create / read / update / list /
-delete, document upload and its metadata, notes, tasks), one CI workflow per version, so each badge
-reflects that version alone. Other versions are not tested; older ones may work.
+Every operation of the node is tested against a real Paperless-ngx (create, read, update, list and delete,
+document upload and its metadata, notes, tasks), one CI workflow per version, so each badge reflects that
+version alone. Other versions are not tested; older ones may work.
 
 | Paperless-ngx version | Status |
 | --- | --- |
@@ -120,18 +75,32 @@ reflects that version alone. Other versions are not tested; older ones may work.
 | 3.2.1 | [![E2E (Paperless-ngx 3.2.1)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml) |
 | 3.3.2 | [![E2E (Paperless-ngx 3.3.2)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml) |
 
-Run the same suite locally against a throwaway Paperless-ngx (needs Docker):
+## Contributing
+
+You need [mise](https://mise.jdx.dev) and, for the end-to-end tests, Docker.
 
 ```sh
-E2E_VERSION=3.3.2 mise run ci:e2e
+mise install                # Node, pnpm and rtunk
+mise run ci                 # lint, then build
+mise run lint               # every linter, through rtunk
+mise run ci:e2e 3.3.2       # the end-to-end tests against a throwaway Paperless-ngx 3.3.2
 ```
+
+`mise run ci:e2e` starts Paperless-ngx and Redis from [docker-compose.test.yml](docker-compose.test.yml), runs
+[the tests](tests/e2e), then removes everything. The version is the Paperless-ngx image tag, so any release can be
+tried the same way. To add one to CI, add it to the `ci:e2e:versions` task of [mise.toml](mise.toml).
+
+Commits follow [gitsym](https://github.com/axnic/gitsym), for example `+[document]: Add a split operation`.
+
+To try the node in a live n8n next to a Paperless-ngx, `tilt up` starts both with hot reload (see the
+[Tiltfile](Tiltfile)).
 
 ## Resources
 
 - [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 - [Paperless-ngx documentation](https://docs.paperless-ngx.com/)
-- [Paperless-ngx API documentation](https://docs.paperless-ngx.com/api/)
+- [Paperless-ngx REST API](https://docs.paperless-ngx.com/api/)
 
 ## License
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+[MIT](LICENSE.md)
