@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+#
+# =============================================================================
+# OSV-Scanner — Known vulnerabilities in the lockfiles, in code scanning
+# =============================================================================
+# Scans the repository's manifests and lockfiles with OSV-Scanner on every pull request (only the
+# vulnerabilities it introduces), on push to the default branch and weekly. The findings are
+# uploaded to the Security tab (code scanning).
+#
+# Jobs:
+#   osv — OSV-Scanner SARIF scan, from security.osv
+#
+# MANAGED BY TERRAFORM (axnic/.github, terraform/modules/workflows) — do not edit by hand.
+# Reusable workflow: https://github.com/axnic/.github/blob/main/.github/workflows/security.osv.yaml
+# =============================================================================
+
+name: OSV-Scanner
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  schedule:
+    - cron: 30 5 * * 1
+
+concurrency:
+  group: osv-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Minimal top-level permissions — each job declares what it needs.
+permissions: {}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # osv — OSV-Scanner SARIF scan, from security.osv
+  # ---------------------------------------------------------------------------
+  osv:
+    name: 🛡️ OSV-Scanner
+    # Pinned to the axnic/.github commit that last changed this workflow; Terraform keeps it up to date.
+    uses: axnic/.github/.github/workflows/security.osv.yaml@2be6fad9cc86f4520dd7295f2ea34407331082dd # main
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
