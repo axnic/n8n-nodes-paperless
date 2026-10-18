@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+#
+# =============================================================================
+# E2E Sync — Keep one E2E caller per upstream version
+# =============================================================================
+# Lists the versions to test (mise run ci:e2e:versions) and opens a pull request that
+# adds or removes the merge_group,pull_request,push.e2e-<version>.yaml callers (each runs
+# mise run ci:e2e) and their README badges. Those callers are NOT managed by Terraform.
+# Requires the mise task: ci:e2e:versions.
+#
+# Jobs:
+#   sync — add/remove the per-version E2E callers in a pull request, from e2e.sync
+#
+# MANAGED BY TERRAFORM (axnic/.github, terraform/modules/workflows) — do not edit by hand.
+# Reusable workflow: https://github.com/axnic/.github/blob/main/.github/workflows/e2e.sync.yaml
+# =============================================================================
+
+name: E2E Sync
+
+on:
+  schedule:
+    - cron: 0 3 * * 1
+  workflow_dispatch: {}
+
+concurrency:
+  group: e2e-sync
+  cancel-in-progress: false
+
+# Minimal top-level permissions — each job declares what it needs.
+permissions: {}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # sync — add/remove the per-version E2E callers in a pull request, from e2e.sync
+  # ---------------------------------------------------------------------------
+  sync:
+    name: 🔄 Sync E2E callers
+    # Pinned to the axnic/.github commit that last changed this workflow; Terraform keeps it up to date.
+    uses: axnic/.github/.github/workflows/e2e.sync.yaml@046e99034268e6d126fda546a7091f6336046216 # main
+    secrets: inherit
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      commit-subject: "=[ci]: Sync E2E callers"
