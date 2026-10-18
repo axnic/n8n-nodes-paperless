@@ -1,11 +1,11 @@
 ---
 name: create-issue
-description: Use when work in the n8n-nodes-paperless repository surfaces something that should be tracked as a GitHub issue ("this deserves its own issue", "we should do X later", "file a bug for this", "open an issue", "track this follow-up"): a bug found in passing, a follow-up that does not fit the current PR, a missing operation or parameter, a Paperless-ngx or n8n compatibility problem, an upstream blocker. Runs the duplicate check with `gh`, sets a sentence-form title, the Issue Type (Bug, Feature, Task), the `type::*` and optional `priority::*` labels, and a Context / Proposal / Acceptance criteria / Notes body. Never for security vulnerabilities.
+description: Use when work in the n8n-nodes-paperless-ngx repository surfaces something that should be tracked as a GitHub issue ("this deserves its own issue", "we should do X later", "file a bug for this", "open an issue", "track this follow-up"): a bug found in passing, a follow-up that does not fit the current PR, a missing operation or parameter, a Paperless-ngx or n8n compatibility problem, an upstream blocker. Runs the duplicate check with `gh`, sets a sentence-form title, the Issue Type (Bug, Feature, Task), the `type::*` and optional `priority::*` labels, and a Context / Proposal / Acceptance criteria / Notes body. Never for security vulnerabilities.
 ---
 
 # Create an issue
 
-Repo: `axnic/n8n-nodes-paperless`; always pass `-R axnic/n8n-nodes-paperless` to `gh`. Issues are for
+Repo: `axnic/n8n-nodes-paperless-ngx`; always pass `-R axnic/n8n-nodes-paperless-ngx` to `gh`. Issues are for
 work and information the codebase does not already carry.
 
 ## 0. Never file these publicly
@@ -39,8 +39,8 @@ evidence; questions the code answers.
 ## 2. Duplicate check
 
 ```bash
-gh issue list -R axnic/n8n-nodes-paperless --state all --search "<symptom or feature keywords>" -L 10
-gh pr list    -R axnic/n8n-nodes-paperless --state all --search "<keywords>" -L 5
+gh issue list -R axnic/n8n-nodes-paperless-ngx --state all --search "<symptom or feature keywords>" -L 10
+gh pr list    -R axnic/n8n-nodes-paperless-ngx --state all --search "<keywords>" -L 5
 ```
 
 Related issue found: comment on it, or file a distinct one and cross-link. Fixed already by a merged
@@ -81,7 +81,7 @@ commits and PR titles only; do not use it here.
 
 Set exactly one Issue Type (`gh issue create --type`; the repo has `Bug`, `Feature`, `Task`), one
 `type::*` label, and a `priority::*` label only when the priority is obvious from the evidence.
-Labels are the ones the repository has (`gh label list -R axnic/n8n-nodes-paperless`); do not create
+Labels are the ones the repository has (`gh label list -R axnic/n8n-nodes-paperless-ngx`); do not create
 labels.
 
 | Intent                                          | Issue Type | `type::*` label  |
@@ -147,7 +147,7 @@ Cross-links (issues, PRs, upstream Paperless-ngx or n8n issues). Optional.
 Write the body to a file in the session scratchpad and use `--body-file`; never inline in the shell.
 
 ```bash
-gh issue create -R axnic/n8n-nodes-paperless \
+gh issue create -R axnic/n8n-nodes-paperless-ngx \
   --title "<sentence-form title>" \
   --body-file <scratchpad>/issue.md \
   --type Bug \
@@ -155,7 +155,7 @@ gh issue create -R axnic/n8n-nodes-paperless \
 ```
 
 `--type` needs a recent `gh`; if it is rejected, create without it and set the type with
-`gh issue edit <n> -R axnic/n8n-nodes-paperless --type Bug`, and if that fails too, say so in the
+`gh issue edit <n> -R axnic/n8n-nodes-paperless-ngx --type Bug`, and if that fails too, say so in the
 report rather than skipping silently. The command prints the URL; the number is its last path
 segment.
 

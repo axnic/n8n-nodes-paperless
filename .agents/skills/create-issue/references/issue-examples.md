@@ -3,7 +3,7 @@
 Illustrative: they are built from real repository facts (the supported Paperless-ngx versions in
 `mise.toml`, the `ci:e2e` workflow, the operations table of the README) and are shape references,
 not records. Replace them with real issues as they appear
-(`gh issue list -R axnic/n8n-nodes-paperless`).
+(`gh issue list -R axnic/n8n-nodes-paperless-ngx`).
 
 ## Bug: evidenced, with a reproduction
 

@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Use when the user wants to commit, stage, or finalize work in the n8n-nodes-paperless repository — creating a commit message, splitting staged changes into atomic commits, or checking a message against the project's commitlint rules.
+description: Use when the user wants to commit, stage, or finalize work in the n8n-nodes-paperless-ngx repository — creating a commit message, splitting staged changes into atomic commits, or checking a message against the project's commitlint rules.
 ---
 
 # Git commit convention

@@ -4,7 +4,7 @@
 	// -- Docker environment configuration
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"remoteUser": "vscode",
-	"workspaceFolder": "/workspaces/n8n-nodes-paperless",
+	"workspaceFolder": "/workspaces/n8n-nodes-paperless-ngx",
 	// -- IDE configuration
 	"features": {
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1.6.0": {

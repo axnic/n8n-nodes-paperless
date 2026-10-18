@@ -1,15 +1,14 @@
-# n8n-nodes-paperless
+# n8n-nodes-paperless-ngx
 
 <!-- markdownlint-disable MD033 MD034 -->
 <img
-  src="https://raw.githubusercontent.com/axnic/n8n-nodes-paperless/refs/heads/main/nodes/Paperless/v2/paperless-ngx.svg"
+  src="https://raw.githubusercontent.com/axnic/n8n-nodes-paperless-ngx/refs/heads/main/icons/paperless-ngx.svg"
   alt="Paperless-ngx"
-  height="64"
->
+  height="64">
 <!-- markdownlint-enable MD033 MD034 -->
 
-[![QA](https://img.shields.io/github/actions/workflow/status/axnic/n8n-nodes-paperless/merge_group%2Cpull_request%2Cpush.qa.yaml?branch=main&label=QA)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.qa.yaml)
-[![license](https://img.shields.io/github/license/axnic/n8n-nodes-paperless?label=license)](LICENSE.md)
+[![QA](https://img.shields.io/github/actions/workflow/status/axnic/n8n-nodes-paperless-ngx/merge_group%2Cpull_request%2Cpush.qa.yaml?branch=main&label=QA)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.qa.yaml)
+[![license](https://img.shields.io/github/license/axnic/n8n-nodes-paperless-ngx?label=license)](LICENSE.md)
 [![commits](https://img.shields.io/badge/commits-gitsym-blue)](https://github.com/axnic/gitsym)
 
 An [n8n](https://n8n.io) community node for [Paperless-ngx](https://docs.paperless-ngx.com/): upload documents,
@@ -27,7 +26,7 @@ search them, tag and annotate them from your workflows, without writing a single
 In n8n, go to **Settings > Community Nodes > Install** and enter the package name:
 
 ```text
-@n8n-chezmoi-sh/n8n-nodes-paperless
+@axnic/n8n-nodes-paperless-ngx
 ```
 
 See the [community nodes guide](https://docs.n8n.io/integrations/community-nodes/installation/) for the details,
@@ -93,11 +92,11 @@ version alone. Other versions are not tested; older ones may work.
 
 | Paperless-ngx version | Status |
 | --- | --- |
-| 2.20 | [![E2E (Paperless-ngx 2.20)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-2.20.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-2.20.yaml) |
-| 3.0.5 | [![E2E (Paperless-ngx 3.0.5)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.0.5.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.0.5.yaml) |
-| 3.1.3 | [![E2E (Paperless-ngx 3.1.3)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.1.3.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.1.3.yaml) |
-| 3.2.1 | [![E2E (Paperless-ngx 3.2.1)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml) |
-| 3.3.2 | [![E2E (Paperless-ngx 3.3.2)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml) |
+| 2.20 | [![E2E (Paperless-ngx 2.20)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-2.20.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-2.20.yaml) |
+| 3.0.5 | [![E2E (Paperless-ngx 3.0.5)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.0.5.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.0.5.yaml) |
+| 3.1.3 | [![E2E (Paperless-ngx 3.1.3)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.1.3.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.1.3.yaml) |
+| 3.2.1 | [![E2E (Paperless-ngx 3.2.1)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml) |
+| 3.3.2 | [![E2E (Paperless-ngx 3.3.2)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml) |
 
 ## Contributing
 

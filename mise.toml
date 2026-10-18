@@ -1,5 +1,5 @@
 # =============================================================================
-# n8n-nodes-paperless — Development Environment
+# n8n-nodes-paperless-ngx — Development Environment
 # =============================================================================
 # This mise configuration provides the toolchain needed to build, lint and audit the
 # Paperless-ngx community node for n8n, and defines the tasks shared by local development and CI.
