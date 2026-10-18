@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+#
+# =============================================================================
+# Code Scanning — CodeQL static analysis
+# =============================================================================
+# Runs CodeQL on pull requests, pushes to the default branch and on a schedule;
+# results land in the repository's Security tab.
+#
+# Jobs:
+#   scan — CodeQL analysis, from core.scan
+#
+# MANAGED BY TERRAFORM (axnic/.github, terraform/modules/workflows) — do not edit by hand.
+# Reusable workflow: https://github.com/axnic/.github/blob/main/.github/workflows/core.scan.yaml
+# =============================================================================
+
+name: Code Scanning
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+  schedule:
+    - cron: 0 6 * * *
+
+concurrency:
+  group: scan-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Minimal top-level permissions — each job declares what it needs.
+permissions: {}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # scan — CodeQL analysis, from core.scan
+  # ---------------------------------------------------------------------------
+  scan:
+    name: 🧬 CodeQL
+    # Pinned to the axnic/.github commit that last changed this workflow; Terraform keeps it up to date.
+    uses: axnic/.github/.github/workflows/core.scan.yaml@0de47d4c78c2a071698bddd5877745d921c98487 # main
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    with:
+      languages: "[\"javascript-typescript\"]"
