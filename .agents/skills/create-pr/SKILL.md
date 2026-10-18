@@ -1,6 +1,6 @@
 ---
 name: create-pr
-description: Use when the user wants to open, create or submit a pull request for the current work in the n8n-nodes-paperless repository ("open a PR", "push this and create the PR", "make a pull request"). Runs the pre-flight (context, commit validation, `mise run ci`), pushes the branch, writes a PR title that is a valid gitsym commit header (the merge commit keeps it) and a body that does not trip commitlint's footer-trailer parsing, creates it with `gh`, then arms a Monitor on the PR (comments, reviews, CI, merge). The repository ruleset requires a pull request, so this is the only way work lands on `main`.
+description: Use when the user wants to open, create or submit a pull request for the current work in the n8n-nodes-paperless-ngx repository ("open a PR", "push this and create the PR", "make a pull request"). Runs the pre-flight (context, commit validation, `mise run ci`), pushes the branch, writes a PR title that is a valid gitsym commit header (the merge commit keeps it) and a body that does not trip commitlint's footer-trailer parsing, creates it with `gh`, then arms a Monitor on the PR (comments, reviews, CI, merge). The repository ruleset requires a pull request, so this is the only way work lands on `main`.
 ---
 
 # Create a pull request
@@ -8,7 +8,7 @@ description: Use when the user wants to open, create or submit a pull request fo
 The ruleset of `main` requires a pull request and signed commits, and the repository only allows
 **merge commits** (squash and rebase are disabled). The merge commit title is the PR title and its
 message is the PR body (`merge_commit_title: PR_TITLE`, `merge_commit_message: PR_BODY`). The repo is
-`axnic/n8n-nodes-paperless`; always pass `-R axnic/n8n-nodes-paperless` to `gh` instead of relying on
+`axnic/n8n-nodes-paperless-ngx`; always pass `-R axnic/n8n-nodes-paperless-ngx` to `gh` instead of relying on
 the working directory. Merging is the user's call, never done here unless explicitly asked.
 
 ## 1. Pre-flight
@@ -46,7 +46,7 @@ the working directory. Merging is the user's call, never done here unless explic
    a command that actually ran and passed.
 
 5. Style reference: `references/pr-examples.md`; recent merged PRs:
-   `gh pr list -R axnic/n8n-nodes-paperless --state merged -L 5`.
+   `gh pr list -R axnic/n8n-nodes-paperless-ngx --state merged -L 5`.
 
 ## 2. Branch and push
 
@@ -113,12 +113,12 @@ There is no PR template in this repository; use these sections (keep the heading
 Write the body to a file in the session scratchpad, never inline in the shell.
 
 ```bash
-gh pr create -R axnic/n8n-nodes-paperless --base main --head <branch> \
+gh pr create -R axnic/n8n-nodes-paperless-ngx --base main --head <branch> \
   --title "<header>" --body-file <scratchpad>/pr.md
 ```
 
 The command prints the PR URL; the number is its last path segment. Labels are optional: use only
-existing ones (`type::*`, `status::*`, `priority::*`, see `gh label list -R axnic/n8n-nodes-paperless`);
+existing ones (`type::*`, `status::*`, `priority::*`, see `gh label list -R axnic/n8n-nodes-paperless-ngx`);
 do not create labels.
 
 ## 5. Monitor
@@ -151,7 +151,7 @@ Monitor({
   claim against the code before changing anything, and tell the user. Do not reply or resolve on the
   user's behalf unless asked.
 - `check <name>: fail`: read the log with
-  `gh run view <run-id> -R axnic/n8n-nodes-paperless --log-failed`, find the cause and tell the user.
+  `gh run view <run-id> -R axnic/n8n-nodes-paperless-ngx --log-failed`, find the cause and tell the user.
   An `E2E (<version>)` failure on a single version often is a Paperless-ngx API difference: reproduce
   it locally with `mise run ci:e2e <version>`. Fix only what belongs to this PR's changes.
 - `review APPROVED` or a plain `COMMENTED` with no ask: note it to the user, no action.

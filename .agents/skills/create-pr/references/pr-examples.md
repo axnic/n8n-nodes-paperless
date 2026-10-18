@@ -1,9 +1,9 @@
 # PR examples
 
-Illustrative: the merged PRs of `axnic/n8n-nodes-paperless` predate the gitsym convention (#11 to #18
+Illustrative: the merged PRs of `axnic/n8n-nodes-paperless-ngx` predate the gitsym convention (#11 to #18
 use gitmoji or Conventional Commits titles). These examples are built from the repository's recent
 gitsym commits and are shape references, not records. Replace them with real PRs as they appear
-(`gh pr list -R axnic/n8n-nodes-paperless --state merged`). Titles are commit headers because the
+(`gh pr list -R axnic/n8n-nodes-paperless-ngx --state merged`). Titles are commit headers because the
 merge commit keeps them.
 
 ## Small fix with a real root cause

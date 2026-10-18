@@ -4,8 +4,8 @@ version_settings(constraint='>=0.22.2')
 
 print("""
 -----------------------------------------------------------------
-  Welcome to n8n-nodes-paperless Tilt configuration!
-    This Tiltfile is used to play with the n8n-nodes-paperless
+  Welcome to n8n-nodes-paperless-ngx Tilt configuration!
+    This Tiltfile is used to play with the n8n-nodes-paperless-ngx
     project and develop it in a easy way.
 -----------------------------------------------------------------
 """.strip())
