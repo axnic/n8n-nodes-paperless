@@ -4,7 +4,7 @@ import {
 	INodeProperties,
 	NodeOperationError,
 } from 'n8n-workflow';
-import { apiRequestPaginated } from '../../transport';
+import { apiRequest } from '../../transport';
 
 export const description: INodeProperties[] = [
 	{
@@ -27,14 +27,14 @@ export async function execute(
 	this: IExecuteFunctions,
 	itemIndex: number,
 ): Promise<INodeExecutionData> {
-	const endpoint = `/tasks/`;
-	const responses = (await apiRequestPaginated.call(this, itemIndex, 'GET', endpoint)) as any[];
-
 	const task_id = this.getNodeParameter('id', itemIndex);
-	const task = responses
-		.map((response) => response.body)
-		.flat()
-		.find((task: any) => task.task_id === task_id);
+
+	// Up to Paperless-ngx 2.x the task list is a plain array, from 3.0 it is paginated.
+	const response = (await apiRequest.call(this, itemIndex, 'GET', '/tasks/', undefined, {
+		task_id,
+	})) as any;
+	const tasks: any[] = Array.isArray(response) ? response : (response?.results ?? []);
+	const task = tasks.find((task) => task.task_id === task_id);
 
 	if (!task) {
 		throw new NodeOperationError(this.getNode(), `Task with ID ${task_id} not found.`);
