@@ -59,9 +59,7 @@
 	"peerDependencies": {
 		"n8n-workflow": "*"
 	},
-	"dependencies": {
-		"form-data": "^4.0.1"
-	},
+	"dependencies": {},
 	"bugs": {
 		"url": "https://github.com/chezmoi-sh/n8n-nodes-paperless-ngx/issues"
 	}
