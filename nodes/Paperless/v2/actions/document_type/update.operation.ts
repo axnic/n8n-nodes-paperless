@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -107,8 +108,8 @@ export async function execute(
 	const id = (this.getNodeParameter('id', itemIndex) as INodeParameterResourceLocator).value;
 	const endpoint = `/document_types/${id}/`;
 
-	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as any;
-	const body: any = {};
+	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as IDataObject;
+	const body: IDataObject = {};
 
 	if (updateFields.name) {
 		body.name = updateFields.name;
@@ -120,7 +121,7 @@ export async function execute(
 		body.match = updateFields.match;
 	}
 
-	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

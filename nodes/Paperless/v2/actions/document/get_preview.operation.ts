@@ -87,7 +87,7 @@ export async function execute(
 		undefined,
 		undefined,
 		{ returnFullResponse: true, encoding: 'arraybuffer' },
-	)) as any;
+	)) as { headers: Record<string, string>; body: ArrayBuffer };
 	const filename =
 		preview.headers['content-disposition']
 			?.match(/filename="(?:b['"])?([^"]+)(?:['"])?"/)?.[1]

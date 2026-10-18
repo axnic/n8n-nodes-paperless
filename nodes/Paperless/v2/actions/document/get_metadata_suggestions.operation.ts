@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -118,10 +119,12 @@ export async function execute(
 			: (typeof response)[K];
 	};
 
-	const options = this.getNodeParameter('options', itemIndex, {}) as any;
+	const options = this.getNodeParameter('options', itemIndex, {}) as {
+		use_metadata_values?: boolean;
+	};
 	if (options.use_metadata_values) {
 		const fetchMetadata = async (id: number, endpoint: string): Promise<string> => {
-			const response = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as any;
+			const response = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as IDataObject;
 			return response.name as string;
 		};
 

@@ -6,6 +6,13 @@ import type {
 	ILoadOptionsFunctions,
 } from 'n8n-workflow';
 
+/** A full response of the Paperless-ngx API, as returned by `apiRequestPaginated` for each page. */
+export interface PageResponse {
+	statusCode: number;
+	statusMessage?: string;
+	body: { results: IDataObject[]; details?: string };
+}
+
 type Context = IExecuteFunctions | ILoadOptionsFunctions;
 
 // NOTE: `_itemIndex` is kept so that every caller keeps its signature; the

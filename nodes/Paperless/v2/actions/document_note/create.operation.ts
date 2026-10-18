@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -101,7 +102,7 @@ export async function execute(
 		note: this.getNodeParameter('note', itemIndex),
 	};
 
-	const response = (await apiRequest.call(this, itemIndex, 'POST', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'POST', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

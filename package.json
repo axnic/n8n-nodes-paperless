@@ -42,7 +42,7 @@
 		"nodes": [
 			"dist/nodes/Paperless/Paperless.node.js"
 		],
-		"strict": false
+		"strict": true
 	},
 	"devDependencies": {
 		"@n8n/node-cli": "^0.52.5",

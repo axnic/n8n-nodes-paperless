@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
+import { IDataObject, IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
 import { apiRequest } from '../../transport';
 
 export const description: INodeProperties[] = [
@@ -192,7 +192,14 @@ export async function execute(
 		binaryData.fileName,
 	);
 
-	const additionalFields = this.getNodeParameter('additional_fields', itemIndex) as any;
+	const additionalFields = this.getNodeParameter('additional_fields', itemIndex) as {
+		archive_serial_number?: number;
+		correspondent?: { value: string };
+		created?: string;
+		document_type?: { value: string };
+		storage_path?: { value: string };
+		title?: string;
+	};
 	Object.entries({
 		archive_serial_number: additionalFields.archive_serial_number,
 		correspondent: additionalFields.correspondent?.value,
@@ -214,7 +221,7 @@ export async function execute(
 		undefined,
 		undefined,
 		{ body: formData },
-	)) as any;
+	)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

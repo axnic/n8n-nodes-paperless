@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -117,8 +118,12 @@ export async function execute(
 	const id = (this.getNodeParameter('id', itemIndex) as INodeParameterResourceLocator).value;
 	const endpoint = `/custom_fields/${id}/`;
 
-	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as any;
-	const body: any = {};
+	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as {
+		name?: string;
+		select_options?: { option: { name: string }[] };
+		default_currency?: string;
+	};
+	const body: { name?: string; extra_data?: IDataObject } = {};
 
 	if (updateFields.name) {
 		body.name = updateFields.name;
@@ -126,7 +131,7 @@ export async function execute(
 	if (updateFields.select_options) {
 		body.extra_data = {};
 		body.extra_data.select_options = updateFields.select_options.option.map(
-			(option: { name: string }) => ({
+			(option) => ({
 				label: option.name.trim(),
 				id: createHash('sha256').update(option.name.trim()).digest('hex'),
 			}),
@@ -137,7 +142,7 @@ export async function execute(
 		body.extra_data.default_currency = updateFields.default_currency;
 	}
 
-	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }
