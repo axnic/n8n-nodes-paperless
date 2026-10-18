@@ -1,44 +1,120 @@
 # =============================================================================
 # n8n-nodes-paperless — Development Environment
 # =============================================================================
-# The task names follow the axnic/.github contract, so the shared workflows run them as-is:
+# This mise configuration provides the toolchain needed to build, lint and audit the
+# Paperless-ngx community node for n8n, and defines the tasks shared by local development and CI.
+# CI never calls the tools directly: the central workflows of axnic/.github, called from this
+# repository, run `mise run` tasks. The task names follow the axnic/.github contract:
 #   https://github.com/axnic/.github/blob/main/docs/Mise-Tasks.md
 #
+# First run:
+#   mise trust      # Trust this configuration (if prompted)
+#   mise install    # Install the tools (node, pnpm, rtunk)
+#
+# The npm dependencies are installed automatically before `mise run` (see [deps.pnpm]).
+#
 # Tasks:
-#   ci:commitlint  — validate commit messages on a range (--from/--to or --last)
-#   ci:lint        — eslint, run by core.qa
-#   ci:build       — compile the node and copy its icons
-#   security:audit — audit the npm dependencies for known vulnerabilities
-#   ci             — local gate: ci:lint, then ci:build
+#   lint            — lint every file with rtunk (local only: rtunk is the CI gate through its own action)
+#   lint:fix        — same, and apply the available fixes
+#   ci:commitlint   — validate commit messages on a range (--from/--to or --last)
+#   ci:lint         — ESLint with the n8n community-package rules (core.qa)
+#   ci:build        — compile the node with tsc and copy its icons
+#   security:audit  — audit the npm dependencies for known vulnerabilities (security.audit)
+#   ci              — local gate: ci:lint, then ci:build
+# =============================================================================
+
+# =============================================================================
+# Settings
+# =============================================================================
+# experimental = true — required by [deps.pnpm] below (mise deps is experimental).
 # =============================================================================
 
 [settings]
-experimental = true # required by [deps] below
+experimental = true
+
+# =============================================================================
+# Tools
+# =============================================================================
 
 [tools]
-node = "lts"
-pnpm = "9"
+node = "lts"                     # Runtime for the node, its build and commitlint
+pnpm = "9"                       # Package manager (package.json: packageManager)
+"github:axnic/rtunk" = "latest"  # Code quality platform (Trunk-compatible), configured in .rtunk/rtunk.yaml
 
-# `pnpm install` runs automatically before `mise run`.
+# =============================================================================
+# Dependencies
+# =============================================================================
+# npm dependencies of the node, installed automatically before `mise run` and
+# `mise exec` (or manually with `mise deps`).
+# =============================================================================
+
 [deps.pnpm]
 auto = true
+
+# =============================================================================
+# Tasks
+# =============================================================================
+# `ci:*` tasks are the units the central CI workflows run. Each is also the exact command to run
+# locally. `lint` and `security:audit` live outside the `ci:` namespace.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Quality Gate
+# -----------------------------------------------------------------------------
+
+[tasks.lint]
+description = "Run rtunk's lint stack (.rtunk/rtunk.yaml) on every file"
+run = "rtunk check ."
+
+[tasks."lint:fix"]
+description = "Run rtunk's lint stack on every file and apply the available fixes"
+run = "rtunk check --fix ."
+
+# -----------------------------------------------------------------------------
+# ci:lint — ESLint with eslint-plugin-n8n-nodes-base. The generic linters run through rtunk
+# (core.qa); this one needs the project's dependencies, so it is a task of its own.
+# -----------------------------------------------------------------------------
+
+[tasks."ci:lint"]
+description = "Lint the node with ESLint (n8n community-package rules)"
+run = "pnpm lint"
+
+# -----------------------------------------------------------------------------
+# commitlint — validates commit messages against the gitsym format, using
+# .commitlintrc.js (which extends @axnic/commitlint-config-gitsym). The commit-msg hook checks the
+# message being written (rtunk `commitlint` action); this task checks commits that already exist.
+#
+# A range is required: without one commitlint waits on stdin.
+#
+# Usage: mise run ci:commitlint -- --from <sha> --to <sha>
+#        mise run ci:commitlint -- --last
+# -----------------------------------------------------------------------------
 
 [tasks."ci:commitlint"]
 description = "Validate commit messages (usage: mise run ci:commitlint -- --from <sha> --to <sha> | --last)"
 tools."npm:@commitlint/cli" = "latest"
+tools."npm:@axnic/commitlint-config-gitsym" = "latest"
 run = "commitlint --verbose"
 
-[tasks."ci:lint"]
-description = "Lint the node"
-run = "pnpm lint"
+# -----------------------------------------------------------------------------
+# Build — tsc, then the icons (gulp). Not run by the shared workflows yet.
+# -----------------------------------------------------------------------------
 
 [tasks."ci:build"]
-description = "Compile (tsc) the node and copy its icons"
+description = "Compile the node with tsc and copy its icons"
 run = "pnpm build"
+
+# -----------------------------------------------------------------------------
+# Security — fails on high or critical advisories in the npm dependencies.
+# -----------------------------------------------------------------------------
 
 [tasks."security:audit"]
 description = "Audit the npm dependencies"
 run = "pnpm audit --audit-level=high"
+
+# -----------------------------------------------------------------------------
+# Local gate — lint, then build.
+# -----------------------------------------------------------------------------
 
 [tasks.ci]
 description = "Local gate run before a release (lint, then build)"
