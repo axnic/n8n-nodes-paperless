@@ -14,16 +14,15 @@ import * as task from './task/task.resource';
 export const description: INodeTypeDescription = {
 	displayName: 'Paperless-ngx',
 	name: 'paperless',
-	icon: 'file:paperless-ngx.svg',
+	icon: 'file:../../icons/paperless-ngx.svg',
 	group: ['input'],
 	version: 2,
 	subtitle: '={{ $parameter.operation + ": " + $parameter.resource }}',
-	description: 'Consume documents and metadata from Paperless-ngx API',
+	description: 'Search, read and manage the documents, tags, correspondents, document types, custom fields, notes and tasks of a Paperless-ngx instance',
 	defaults: { name: 'Paperless-ngx' },
 
 	credentials: [{ name: 'paperlessApi', required: true }],
 	inputs: [NodeConnectionTypes.Main],
-	// eslint-disable-next-line n8n-nodes-base/node-class-description-outputs-wrong
 	outputs: [NodeConnectionTypes.Main],
 
 	properties: [

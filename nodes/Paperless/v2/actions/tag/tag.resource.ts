@@ -22,6 +22,7 @@ export const description: INodeProperties[] = [
 				name: 'Create a Tag',
 				value: 'create',
 				action: 'Create a new tag',
+				description: 'Create a new tag',
 			},
 			{
 				name: 'Delete a Tag',
@@ -37,6 +38,7 @@ export const description: INodeProperties[] = [
 				name: 'List Tags',
 				value: 'list',
 				action: 'List all tags',
+				description: 'List all tags',
 			},
 			{
 				name: 'Update a Tag',

@@ -1,92 +1,87 @@
-import {
+import type {
 	IDataObject,
 	IExecuteFunctions,
 	IHttpRequestMethods,
+	IHttpRequestOptions,
 	ILoadOptionsFunctions,
-	IRequestOptions,
-	PaginationOptions,
 } from 'n8n-workflow';
 
-export async function apiRequest(
-	this: IExecuteFunctions | ILoadOptionsFunctions,
-	itemIndex: number,
-	method: IHttpRequestMethods,
-	endpoint: string,
-	body: IDataObject = {},
-	query?: IDataObject,
-	option: IRequestOptions = {},
-): Promise<unknown> {
-	const queryParams = query || {};
-
-	const credentials = await this.getCredentials('paperlessApi');
-	const options: IRequestOptions = {
-		headers: {},
-		method,
-		body,
-		qs: queryParams,
-		uri: `${credentials.url}${endpoint}`,
-		json: true,
-	};
-
-	if (Object.keys(option).length) {
-		Object.assign(options, option);
-	}
-
-	if (!Object.keys(body).length) {
-		options.body = undefined;
-	}
-
-	return this.helpers.requestWithAuthentication.call(
-		this,
-		'paperlessApi',
-		options,
-		undefined,
-		itemIndex,
-	);
+/** A full response of the Paperless-ngx API, as returned by `apiRequestPaginated` for each page. */
+export interface PageResponse {
+	statusCode: number;
+	statusMessage?: string;
+	body: { results: IDataObject[]; details?: string };
 }
 
-export async function apiRequestPaginated(
-	this: IExecuteFunctions | ILoadOptionsFunctions,
-	itemIndex: number,
+type Context = IExecuteFunctions | ILoadOptionsFunctions;
+
+// NOTE: `_itemIndex` is kept so that every caller keeps its signature; the
+// credentials do not depend on the item with `httpRequestWithAuthentication`.
+export async function apiRequest(
+	this: Context,
+	_itemIndex: number,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject = {},
 	query?: IDataObject,
-	option: IRequestOptions = {},
-): Promise<unknown[]> {
-	query = query || {};
-
+	option: Partial<IHttpRequestOptions> = {},
+): Promise<unknown> {
 	const credentials = await this.getCredentials('paperlessApi');
-	const options: IRequestOptions = {
-		headers: {},
+	const options: IHttpRequestOptions = {
 		method,
-		body,
-		qs: query,
-		uri: `${credentials.url}${endpoint}`,
+		url: `${credentials.url}${endpoint}`,
+		qs: query ?? {},
 		json: true,
+		...option,
 	};
 
-	if (Object.keys(option).length) {
-		Object.assign(options, option);
+	if (Object.keys(body).length) {
+		options.body = body;
 	}
 
-	if (!Object.keys(body).length) {
-		delete options.body;
+	return await this.helpers.httpRequestWithAuthentication.call(this, 'paperlessApi', options);
+}
+
+/**
+ * Follows the `next` link of every page and returns all the full responses
+ * (`statusCode`, `statusMessage`, `headers` and `body`).
+ */
+export async function apiRequestPaginated(
+	this: Context,
+	_itemIndex: number,
+	method: IHttpRequestMethods,
+	endpoint: string,
+	body: IDataObject = {},
+	query?: IDataObject,
+): Promise<unknown[]> {
+	const credentials = await this.getCredentials('paperlessApi');
+	const responses: unknown[] = [];
+
+	let url: string | null = `${credentials.url}${endpoint}`;
+	let qs: IDataObject = query ?? {};
+	while (url) {
+		const options: IHttpRequestOptions = {
+			method,
+			url,
+			qs,
+			json: true,
+			returnFullResponse: true,
+		};
+		if (Object.keys(body).length) {
+			options.body = body;
+		}
+
+		const response = (await this.helpers.httpRequestWithAuthentication.call(
+			this,
+			'paperlessApi',
+			options,
+		)) as { body?: { next?: string | null } };
+		responses.push(response);
+
+		// `next` already carries the query string of the following page
+		url = response.body?.next ?? null;
+		qs = {};
 	}
 
-	const paginationOptions: PaginationOptions = {
-		continue: '={{ ($response?.body?.next ?? null) !== null }}',
-		request: {
-			url: '={{ $response.body.next }}',
-		},
-		requestInterval: 100,
-	};
-
-	return this.helpers.requestWithAuthenticationPaginated.call(
-		this,
-		options,
-		itemIndex, // NOTE: This is the index of the item in the items array... so we will only ever have one item
-		paginationOptions,
-		'paperlessApi',
-	);
+	return responses;
 }

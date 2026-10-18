@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeProperties,
@@ -10,6 +11,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'ID',
 		name: 'id',
+		description: 'ID of the task',
 		default: '',
 		displayOptions: {
 			show: {
@@ -32,8 +34,8 @@ export async function execute(
 	// Up to Paperless-ngx 2.x the task list is a plain array, from 3.0 it is paginated.
 	const response = (await apiRequest.call(this, itemIndex, 'GET', '/tasks/', undefined, {
 		task_id,
-	})) as any;
-	const tasks: any[] = Array.isArray(response) ? response : (response?.results ?? []);
+	})) as IDataObject;
+	const tasks = (Array.isArray(response) ? response : (response?.results ?? [])) as IDataObject[];
 	const task = tasks.find((task) => task.task_id === task_id);
 
 	if (!task) {

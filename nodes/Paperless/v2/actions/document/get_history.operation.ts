@@ -5,7 +5,7 @@ import {
 	INodeProperties,
 	NodeOperationError,
 } from 'n8n-workflow';
-import { apiRequestPaginated } from '../../transport';
+import { apiRequestPaginated, PageResponse } from '../../transport';
 
 export const description: INodeProperties[] = [
 	{
@@ -56,7 +56,7 @@ export const description: INodeProperties[] = [
 					{
 						type: 'regex',
 						properties: {
-							regex: '^(?:http|https)://(?:.+?)/documents/(\d+)/details$',
+							regex: '^(?:http|https)://(?:.+?)/documents/(\\d+)/details$',
 							errorMessage:
 								'The URL must be a valid Paperless document URL (e.g. https://paperless.example.com/documents/123/details)',
 						},
@@ -64,7 +64,7 @@ export const description: INodeProperties[] = [
 				],
 				extractValue: {
 					type: 'regex',
-					regex: '^(?:http|https)://(?:.+?)/documents/(\d+)/details$',
+					regex: '^(?:http|https)://(?:.+?)/documents/(\\d+)/details$',
 				},
 			},
 		],
@@ -80,7 +80,7 @@ export async function execute(
 ): Promise<INodeExecutionData> {
 	const id = (this.getNodeParameter('id', itemIndex) as INodeParameterResourceLocator).value;
 	const endpoint = `/documents/${id}/history/`;
-	const responses = (await apiRequestPaginated.call(this, itemIndex, 'GET', endpoint)) as any[];
+	const responses = (await apiRequestPaginated.call(this, itemIndex, 'GET', endpoint)) as PageResponse[];
 
 	const statusCode =
 		responses.reduce((acc, response) => acc + response.statusCode, 0) / responses.length;

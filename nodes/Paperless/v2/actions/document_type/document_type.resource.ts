@@ -22,6 +22,7 @@ export const description: INodeProperties[] = [
 				name: 'Create a Document Type',
 				value: 'create',
 				action: 'Create a new document type',
+				description: 'Create a new document type',
 			},
 			{
 				name: 'Delete a Document Type',
@@ -37,6 +38,7 @@ export const description: INodeProperties[] = [
 				name: 'List Document Types',
 				value: 'list',
 				action: 'List all document types',
+				description: 'List all document types',
 			},
 			{
 				name: 'Update a Document Type',

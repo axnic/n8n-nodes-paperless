@@ -1,4 +1,10 @@
-import { IExecuteFunctions, INodeExecutionData, NodeOperationError } from 'n8n-workflow';
+import {
+	IExecuteFunctions,
+	INodeExecutionData,
+	JsonObject,
+	NodeApiError,
+	NodeOperationError,
+} from 'n8n-workflow';
 import type { PaperlessType } from './node.type';
 
 import * as asn from './asn/asn.resource';
@@ -64,7 +70,9 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
 			if (error.description?.includes('cannot accept the provided value')) {
 				error.description += ". Consider using 'Typecast' option";
 			}
-			throw error;
+			throw error instanceof NodeApiError || error instanceof NodeOperationError
+				? error
+				: new NodeApiError(this.getNode(), error as JsonObject, { itemIndex });
 		}
 	}
 

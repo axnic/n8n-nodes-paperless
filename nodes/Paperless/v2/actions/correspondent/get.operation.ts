@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -10,6 +11,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'ID',
 		name: 'id',
+		description: 'ID of the correspondent',
 		default: { mode: 'list', value: '' },
 		displayOptions: {
 			show: {
@@ -57,7 +59,7 @@ export async function execute(
 ): Promise<INodeExecutionData> {
 	const id = (this.getNodeParameter('id', itemIndex) as INodeParameterResourceLocator).value;
 	const endpoint = `/correspondents/${id}/`;
-	const response = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

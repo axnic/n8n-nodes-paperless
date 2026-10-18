@@ -4,7 +4,7 @@ import {
 	INodeProperties,
 	NodeOperationError,
 } from 'n8n-workflow';
-import { apiRequestPaginated } from '../../transport';
+import { apiRequestPaginated, PageResponse } from '../../transport';
 
 export const description: INodeProperties[] = [];
 
@@ -13,7 +13,7 @@ export async function execute(
 	itemIndex: number,
 ): Promise<INodeExecutionData> {
 	const endpoint = '/correspondents/';
-	const responses = (await apiRequestPaginated.call(this, itemIndex, 'GET', endpoint)) as any[];
+	const responses = (await apiRequestPaginated.call(this, itemIndex, 'GET', endpoint)) as PageResponse[];
 
 	const statusCode =
 		responses.reduce((acc, response) => acc + response.statusCode, 0) / responses.length;

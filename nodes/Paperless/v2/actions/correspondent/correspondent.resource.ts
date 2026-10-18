@@ -22,6 +22,7 @@ export const description: INodeProperties[] = [
 				name: 'Create a Correspondent',
 				value: 'create',
 				action: 'Create a new correspondent',
+				description: 'Create a new correspondent',
 			},
 			{
 				name: 'Delete a Correspondent',
@@ -37,6 +38,7 @@ export const description: INodeProperties[] = [
 				name: 'List Correspondents',
 				value: 'list',
 				action: 'List all correspondents',
+				description: 'List all correspondents',
 			},
 			{
 				name: 'Update a Correspondent',

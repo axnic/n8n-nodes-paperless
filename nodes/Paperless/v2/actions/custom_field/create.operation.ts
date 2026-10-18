@@ -1,11 +1,17 @@
 import { createHash } from 'crypto';
-import { IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
+import {
+	IDataObject,
+	IExecuteFunctions,
+	INodeExecutionData,
+	INodeProperties,
+} from 'n8n-workflow';
 import { apiRequest } from '../../transport';
 
 export const description: INodeProperties[] = [
 	{
 		displayName: 'Name',
 		name: 'name',
+		description: 'Name of the custom field',
 		displayOptions: {
 			show: {
 				resource: ['custom_field'],
@@ -95,29 +101,30 @@ export async function execute(
 	itemIndex: number,
 ): Promise<INodeExecutionData> {
 	const endpoint = `/custom_fields/`;
+	const extraData: IDataObject = {};
 	const body = {
 		name: this.getNodeParameter('name', itemIndex),
 		data_type: this.getNodeParameter('data_type', itemIndex),
-		extra_data: {} as any,
+		extra_data: extraData,
 	};
 
 	this.logger.debug(
 		`Creating custom field: ${JSON.stringify(this.getNodeParameter('select_options', itemIndex, null))}`,
 	);
 
-	const selectOptions = this.getNodeParameter('select_options', itemIndex, null) as any;
+	const selectOptions = this.getNodeParameter('select_options', itemIndex, null) as { option: { name: string }[] } | null;
 	if (selectOptions) {
-		body.extra_data.select_options = selectOptions.option.map((option: { name: string }) => ({
+		extraData.select_options = selectOptions.option.map((option) => ({
 			label: option.name.trim(),
 			id: createHash('sha256').update(option.name.trim()).digest('hex'),
 		}));
 	}
-	const defaultCurrency = this.getNodeParameter('default_currency', itemIndex, null) as any;
+	const defaultCurrency = this.getNodeParameter('default_currency', itemIndex, null) as string | null;
 	if (defaultCurrency) {
-		body.extra_data.default_currency = defaultCurrency;
+		extraData.default_currency = defaultCurrency;
 	}
 
-	const response = (await apiRequest.call(this, itemIndex, 'POST', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'POST', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

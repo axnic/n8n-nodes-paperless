@@ -5,6 +5,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Input Binary Field',
 		name: 'binary_property_name',
+		description: 'Name of the binary property holding the file to upload',
 		default: 'data',
 		displayOptions: {
 			show: {
@@ -19,6 +20,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Additional Fields',
 		name: 'additional_fields',
+		description: 'Metadata to set on the new document',
 		type: 'collection',
 		default: {},
 		hint: 'All additional fields are automatically added to the document by Paperless if they are not set',
@@ -181,21 +183,23 @@ export async function execute(
 
 	const binaryPropertyName = this.getNodeParameter('binary_property_name', itemIndex) as string;
 	const binaryData = this.helpers.assertBinaryData(itemIndex, binaryPropertyName);
-	const data = binaryData.id
-		? await this.helpers.getBinaryStream(binaryData.id)
-		: Buffer.from(binaryData.data, 'base64');
+	const data = await this.helpers.getBinaryDataBuffer(itemIndex, binaryPropertyName);
 
-	const formData: IDataObject = {
-		document: {
-			value: data,
-			options: {
-				filename: binaryData.fileName,
-				contentType: binaryData.mimeType,
-			},
-		},
+	const formData = new FormData();
+	formData.append(
+		'document',
+		new Blob([new Uint8Array(data)], { type: binaryData.mimeType }),
+		binaryData.fileName,
+	);
+
+	const additionalFields = this.getNodeParameter('additional_fields', itemIndex) as {
+		archive_serial_number?: number;
+		correspondent?: { value: string };
+		created?: string;
+		document_type?: { value: string };
+		storage_path?: { value: string };
+		title?: string;
 	};
-
-	const additionalFields = this.getNodeParameter('additional_fields', itemIndex) as any;
 	Object.entries({
 		archive_serial_number: additionalFields.archive_serial_number,
 		correspondent: additionalFields.correspondent?.value,
@@ -206,7 +210,7 @@ export async function execute(
 	})
 		.filter(([, value]) => value !== undefined && value !== '')
 		.forEach(([key, value]) => {
-			formData[key] = String(value);
+			formData.append(key, String(value));
 		});
 
 	const response = (await apiRequest.call(
@@ -216,8 +220,8 @@ export async function execute(
 		endpoint,
 		undefined,
 		undefined,
-		{ formData },
-	)) as any;
+		{ body: formData },
+	)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

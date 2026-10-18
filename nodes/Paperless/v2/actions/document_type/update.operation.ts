@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -10,6 +11,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'ID',
 		name: 'id',
+		description: 'ID of the document type',
 		default: { mode: 'list', value: '' },
 		displayOptions: {
 			show: {
@@ -52,6 +54,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Update Fields',
 		name: 'update_fields',
+		description: 'Fields of the document type to change; the ones left out are kept as they are',
 		default: {},
 		displayOptions: {
 			show: {
@@ -63,6 +66,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Name',
 				name: 'name',
+				description: 'Name of the document type',
 				placeholder: 'Name of the document_type',
 				type: 'string',
 				default: '',
@@ -70,6 +74,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Matching Algorithm',
 				name: 'matching_algorithm',
+				description: 'How Paperless-ngx automatically assigns documents to this document type',
 				default: 6,
 				options: [
 					{ name: 'None: Disable matching', value: 0 },
@@ -85,6 +90,7 @@ export const description: INodeProperties[] = [
 			{
 				displayName: 'Matching Expression',
 				name: 'match',
+				description: 'Word, string or regular expression used by the matching algorithm',
 				default: '',
 				placeholder: 'Matching expression to match',
 				type: 'string',
@@ -102,8 +108,8 @@ export async function execute(
 	const id = (this.getNodeParameter('id', itemIndex) as INodeParameterResourceLocator).value;
 	const endpoint = `/document_types/${id}/`;
 
-	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as any;
-	const body: any = {};
+	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as IDataObject;
+	const body: IDataObject = {};
 
 	if (updateFields.name) {
 		body.name = updateFields.name;
@@ -115,7 +121,7 @@ export async function execute(
 		body.match = updateFields.match;
 	}
 
-	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

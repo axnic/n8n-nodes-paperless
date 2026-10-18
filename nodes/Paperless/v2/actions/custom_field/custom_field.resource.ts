@@ -22,6 +22,7 @@ export const description: INodeProperties[] = [
 				name: 'Create a Custom Field',
 				value: 'create',
 				action: 'Create a new custom field',
+				description: 'Create a new custom field',
 			},
 			{
 				name: 'Delete a Custom Field',
@@ -37,6 +38,7 @@ export const description: INodeProperties[] = [
 				name: 'List Custom Fields',
 				value: 'list',
 				action: 'List all custom fields',
+				description: 'List all custom fields',
 			},
 			{
 				name: 'Update a Custom Field',

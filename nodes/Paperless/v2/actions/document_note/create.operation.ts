@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -55,7 +56,7 @@ export const description: INodeProperties[] = [
 					{
 						type: 'regex',
 						properties: {
-							regex: '^(?:http|https)://(?:.+?)/documents/(\d+)/details$',
+							regex: '^(?:http|https)://(?:.+?)/documents/(\\d+)/details$',
 							errorMessage:
 								'The URL must be a valid Paperless document URL (e.g. https://paperless.example.com/documents/123/details)',
 						},
@@ -63,7 +64,7 @@ export const description: INodeProperties[] = [
 				],
 				extractValue: {
 					type: 'regex',
-					regex: '^(?:http|https)://(?:.+?)/documents/(\d+)/details$',
+					regex: '^(?:http|https)://(?:.+?)/documents/(\\d+)/details$',
 				},
 			},
 		],
@@ -101,7 +102,7 @@ export async function execute(
 		note: this.getNodeParameter('note', itemIndex),
 	};
 
-	const response = (await apiRequest.call(this, itemIndex, 'POST', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'POST', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

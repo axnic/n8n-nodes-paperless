@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -55,7 +56,7 @@ export const description: INodeProperties[] = [
 					{
 						type: 'regex',
 						properties: {
-							regex: '^(?:http|https)://(?:.+?)/documents/(\d+)/details$',
+							regex: '^(?:http|https)://(?:.+?)/documents/(\\d+)/details$',
 							errorMessage:
 								'The URL must be a valid Paperless document URL (e.g. https://paperless.example.com/documents/123/details)',
 						},
@@ -63,7 +64,7 @@ export const description: INodeProperties[] = [
 				],
 				extractValue: {
 					type: 'regex',
-					regex: '^(?:http|https)://(?:.+?)/documents/(\d+)/details$',
+					regex: '^(?:http|https)://(?:.+?)/documents/(\\d+)/details$',
 				},
 			},
 		],
@@ -74,6 +75,7 @@ export const description: INodeProperties[] = [
 	{
 		displayName: 'Update Fields',
 		name: 'update_fields',
+		description: 'Fields of the document to change; the ones left out are kept as they are',
 		type: 'collection',
 		default: {},
 		hint: 'All additional fields are automatically added to the document by Paperless if they are not set',
@@ -345,13 +347,23 @@ export async function execute(
 	const id = (this.getNodeParameter('id', itemIndex) as INodeParameterResourceLocator).value;
 	const endpoint = `/documents/${id}/`;
 
-	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as any;
+	const updateFields = this.getNodeParameter('update_fields', itemIndex, {}) as {
+		archive_serial_number?: number;
+		append_tags?: boolean;
+		correspondent?: { value: string };
+		created?: string;
+		custom_fields?: { values: { field: { value: string }; value: unknown }[] };
+		document_type?: { value: string };
+		storage_path?: { value: string };
+		tags?: { values: { tag: { value: string } }[] };
+		title?: string;
+	};
 
-	let tags = updateFields.tags?.values.map((tag: any) => Number(tag.tag.value));
+	let tags = updateFields.tags?.values.map((tag) => Number(tag.tag.value));
 
 	if (updateFields.append_tags && tags && tags.length > 0) {
-		const currentDocument = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as any;
-		const currentTags = (currentDocument.tags || []).map((t: any) => Number(t));
+		const currentDocument = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as IDataObject;
+		const currentTags = ((currentDocument.tags as unknown[] | undefined) ?? []).map((t) => Number(t));
 		tags = [...new Set([...currentTags, ...tags])];
 	}
 
@@ -359,7 +371,7 @@ export async function execute(
 		archive_serial_number: updateFields.archive_serial_number,
 		correspondent: updateFields.correspondent?.value,
 		created: updateFields.created,
-		custom_fields: updateFields.custom_fields?.values.map((customField: any) => ({
+		custom_fields: updateFields.custom_fields?.values.map((customField) => ({
 			field: customField.field.value,
 			value: customField.value,
 		})),
@@ -369,7 +381,7 @@ export async function execute(
 		title: updateFields.title,
 	};
 
-	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as any;
+	const response = (await apiRequest.call(this, itemIndex, 'PATCH', endpoint, body)) as IDataObject;
 
 	return { json: { results: [response] } };
 }

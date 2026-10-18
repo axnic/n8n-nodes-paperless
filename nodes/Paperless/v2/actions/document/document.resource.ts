@@ -38,6 +38,7 @@ export const description: INodeProperties[] = [
 				name: 'Create a Document',
 				value: 'create',
 				action: 'Create a new document',
+				description: 'Create a new document',
 			},
 			{
 				name: 'Delete a Document',
@@ -53,31 +54,37 @@ export const description: INodeProperties[] = [
 				name: 'Get some Metadata Suggestions',
 				value: 'get_metadata_suggestions',
 				action: 'Get some metadata suggestions for a document',
+				description: 'Get some metadata suggestions for a document',
 			},
 			{
 				name: 'Get the Document History',
 				value: 'get_history',
 				action: 'Get the list of changes made to a document',
+				description: 'Get the list of changes made to a document',
 			},
 			{
 				name: 'Get the Document Metadata',
 				value: 'get_metadata',
 				action: 'Get the metadata of the document',
+				description: 'Get the metadata of the document',
 			},
 			{
 				name: 'Get the Document Preview',
 				value: 'get_preview',
 				action: 'Get a preview of the document',
+				description: 'Get a preview of the document',
 			},
 			{
 				name: 'Get the Document Share Link',
 				value: 'get_sharelink',
 				action: 'Get the share link of the document',
+				description: 'Get the share link of the document',
 			},
 			{
 				name: 'List Documents',
 				value: 'list',
 				action: 'List all documents',
+				description: 'List all documents',
 			},
 			{
 				name: 'Update a Document',
