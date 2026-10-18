@@ -19,6 +19,8 @@
 #   ci:commitlint   — validate commit messages on a range (--from/--to or --last)
 #   ci:lint         — ESLint with the n8n community-package rules (core.qa)
 #   ci:build        — compile the node with tsc and copy its icons
+#   ci:e2e          — end-to-end tests against a dockerized Paperless-ngx (E2E_VERSION, needs Docker)
+#   ci:e2e:versions — the Paperless-ngx versions the end-to-end tests cover (e2e.sync)
 #   security:audit  — audit the npm dependencies for known vulnerabilities (security.audit)
 #   ci              — local gate: ci:lint, then ci:build
 # =============================================================================
@@ -84,16 +86,29 @@ run = "pnpm lint"
 # .commitlintrc.js (which extends @axnic/commitlint-config-gitsym). The commit-msg hook checks the
 # message being written (rtunk `commitlint` action); this task checks commits that already exist.
 #
+# commitlint resolves `extends` from the repository, not from mise's install directory: the hidden
+# task links the shared config into node_modules (ignored by git, shared with pnpm's own packages).
+#
 # A range is required: without one commitlint waits on stdin.
 #
 # Usage: mise run ci:commitlint -- --from <sha> --to <sha>
 #        mise run ci:commitlint -- --last
 # -----------------------------------------------------------------------------
 
+[tasks."commitlint:link"]
+description = "Make the gitsym commitlint config resolvable from the repository"
+hide = true
+run = '''
+mkdir -p node_modules/@axnic
+ln -sfn "$(mise where npm:@axnic/commitlint-config-gitsym)/node_modules/@axnic/commitlint-config-gitsym" node_modules/@axnic/commitlint-config-gitsym
+'''
+
 [tasks."ci:commitlint"]
 description = "Validate commit messages (usage: mise run ci:commitlint -- --from <sha> --to <sha> | --last)"
 tools."npm:@commitlint/cli" = "latest"
-tools."npm:@axnic/commitlint-config-gitsym" = "latest"
+# Our own package, younger than minimumPackageAge.
+tools."npm:@axnic/commitlint-config-gitsym" = { version = "latest", allow_low_downloads = true }
+depends = ["commitlint:link"]
 run = "commitlint --verbose"
 
 # -----------------------------------------------------------------------------
@@ -103,6 +118,34 @@ run = "commitlint --verbose"
 [tasks."ci:build"]
 description = "Compile the node with tsc and copy its icons"
 run = "pnpm build"
+
+# -----------------------------------------------------------------------------
+# End-to-end tests — the compiled node against a real Paperless-ngx (docker-compose.test.yml), one
+# version per run: E2E_VERSION is the image tag. tests/e2e needs no dependency but Node and Docker.
+# The central e2e workflows run one caller per version listed by ci:e2e:versions.
+# -----------------------------------------------------------------------------
+
+[tasks."ci:e2e"]
+description = "Run the E2E tests against a dockerized Paperless-ngx (usage: E2E_VERSION=3.3.2 mise run ci:e2e)"
+depends = ["ci:build"]
+run = '''
+: "${E2E_VERSION:?E2E_VERSION is required (e.g. 3.3.2)}"
+export PAPERLESS_VERSION="$E2E_VERSION"
+docker compose -f docker-compose.test.yml up --detach --wait
+status=0
+node --test 'tests/e2e/*.test.js' || status=$?
+[ "$status" -eq 0 ] || docker compose -f docker-compose.test.yml logs --no-color || true
+docker compose -f docker-compose.test.yml down --volumes
+exit "$status"
+'''
+
+# A fixed list: the versions the node is checked against, oldest first. Add one here (and its caller,
+# which e2e.sync creates) to cover a new Paperless-ngx release; drop one when it is no longer supported.
+[tasks."ci:e2e:versions"]
+description = "Print the Paperless-ngx versions covered by the E2E tests (one per line)"
+run = '''
+printf '%s\n' 2.20 3.0.5 3.1.3 3.2.1 3.3.2
+'''
 
 # -----------------------------------------------------------------------------
 # Security — fails on high or critical advisories in the npm dependencies.

@@ -1,0 +1,40 @@
+# Paperless-ngx instance for the end-to-end tests.
+#
+# The version is configurable so the same file can exercise a matrix of Paperless-ngx versions in CI.
+# The admin account is created at startup from PAPERLESS_ADMIN_*; the tests exchange it for an API token.
+#
+# Usage:
+#   PAPERLESS_VERSION=3.3.2 docker compose -f docker-compose.test.yml up --detach --wait
+#   PAPERLESS_URL=http://localhost:8000 pnpm exec node --test tests/e2e
+#   docker compose -f docker-compose.test.yml down --volumes
+
+services:
+  redis:
+    image: docker.io/library/redis:8
+    restart: "no"
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:${PAPERLESS_VERSION:-latest}
+    restart: "no"
+    depends_on:
+      - redis
+    environment:
+      PAPERLESS_REDIS: redis://redis:6379
+      # Throwaway credentials for local/CI testing only.
+      PAPERLESS_ADMIN_USER: admin
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:-e2e-admin-password}
+      PAPERLESS_SECRET_KEY: only-for-the-e2e-tests
+      PAPERLESS_URL: http://localhost:8000
+      # One worker each: enough for the tests, and a smaller footprint on CI runners.
+      PAPERLESS_TASK_WORKERS: "1"
+      PAPERLESS_WEBSERVER_WORKERS: "1"
+      PAPERLESS_OCR_LANGUAGE: eng
+    ports:
+      - 8000:8000
+    healthcheck:
+      # The root redirects to the login page once the web server is up.
+      test: [CMD, curl, --fail, --silent, --max-time, "5", http://localhost:8000]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 20s
