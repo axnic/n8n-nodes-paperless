@@ -106,7 +106,25 @@ To get your API token:
 
 ## Compatibility
 
-Requires n8n version 1.0.0 or later and Paperless-ngx version 2.14.0 or later. Earlier versions may work but are not officially supported or tested.
+Built against `n8n-workflow` 2.16, for n8n 2.x. It needs Node.js 22 or later.
+
+Every operation of the node is tested against a real Paperless-ngx (create / read / update / list /
+delete, document upload and its metadata, notes, tasks), one CI workflow per version, so each badge
+reflects that version alone. Other versions are not tested; older ones may work.
+
+| Paperless-ngx version | Status |
+| --- | --- |
+| 2.20 | [![E2E (Paperless-ngx 2.20)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-2.20.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-2.20.yaml) |
+| 3.0.5 | [![E2E (Paperless-ngx 3.0.5)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.0.5.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.0.5.yaml) |
+| 3.1.3 | [![E2E (Paperless-ngx 3.1.3)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.1.3.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.1.3.yaml) |
+| 3.2.1 | [![E2E (Paperless-ngx 3.2.1)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.2.1.yaml) |
+| 3.3.2 | [![E2E (Paperless-ngx 3.3.2)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml/badge.svg?branch=main)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.e2e-3.3.2.yaml) |
+
+Run the same suite locally against a throwaway Paperless-ngx (needs Docker):
+
+```sh
+E2E_VERSION=3.3.2 mise run ci:e2e
+```
 
 ## Resources
 
