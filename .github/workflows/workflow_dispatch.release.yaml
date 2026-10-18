@@ -1,0 +1,206 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+#
+# =============================================================================
+# Release — Create a versioned release from the GitHub UI
+# =============================================================================
+# Triggered manually (Actions → Release → Run workflow). Set either `bump` or `version`,
+# not both. prepare runs `mise run ci`, computes the version, writes the notes and pushes
+# the tag; the npm job stages the package on npm (a maintainer approves it with 2FA).
+# Requires the mise task: ci, ci:build.
+#
+# Jobs:
+#   prepare — run `mise run ci`, compute the version, write the notes, push the tag
+#   npm — build the package and stage it on npm, in this file: npm trusted publishing only
+#             matches a workflow of the repository itself, not a reusable one
+#
+# MANAGED BY TERRAFORM (axnic/.github, terraform/modules/workflows) — do not edit by hand.
+# Reusable workflow: https://github.com/axnic/.github/blob/main/.github/workflows/release.prepare.yaml
+# =============================================================================
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump (choose `manual` to release the exact `version` below)
+        required: false
+        type: choice
+        default: auto
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+          - manual
+      version:
+        description: Exact version to release, without the leading "v" (only with the `manual` bump)
+        required: false
+        type: string
+      notes:
+        description: Release notes override (leave empty to generate them)
+        required: false
+        type: string
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+# Minimal top-level permissions — each job declares what it needs.
+permissions: {}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # prepare — run `mise run ci`, compute the version, write the notes, push the tag
+  # ---------------------------------------------------------------------------
+  prepare:
+    name: 🏷️ Prepare
+    # Pinned to the axnic/.github commit that last changed this workflow; Terraform keeps it up to date.
+    uses: axnic/.github/.github/workflows/release.prepare.yaml@1b895d962d5cf3dc4c62b2d7a66f5031a267590c # main
+    secrets: inherit
+    permissions:
+      contents: write
+      pull-requests: read
+    with:
+      # `manual` is not a bump: the reusable workflow gets an empty bump and the exact `version`.
+      bump: "${{ inputs.bump != 'manual' && inputs.bump || '' }}"
+      notes: "${{ inputs.notes }}"
+      version: "${{ inputs.version }}"
+      commit-format: gitsym
+
+  # ---------------------------------------------------------------------------
+  # npm — npm package (staged publishing, trusted publishing, NPM_TOKEN fallback)
+  # ---------------------------------------------------------------------------
+  npm:
+    name: 📦 npm package
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing and provenance
+
+    steps:
+      - name: ⬇️ Checkout tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ needs.prepare.outputs.tag }}
+          persist-credentials: false
+
+      - name: 🔧 Install tools via mise
+        uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          cache: true
+          cache_key: "mise-v1-{{platform}}-{{file_hash}}"
+
+      # `mise run ci:build` runs at the repository root; the package is in settings.npm_dir.
+      # The tag is the source of truth for the version: package.json is not bumped by the release.
+      - name: 🏷️ Set the package version
+        working-directory: .
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: npm version "$VERSION" --no-git-tag-version --allow-same-version
+
+      - name: 🏗️ Build the package
+        run: mise run ci:build
+
+      # `npm stage` needs npm >= 11.15.0 (the one bundled with the mise node is older).
+      - name: ⬆️ Update npm
+        run: npm install --global npm@^11.15.0
+
+      - name: 🚀 Stage on npm (approval required)
+        working-directory: .
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ -n "$(npm view "${NAME}@${VERSION}" version 2>/dev/null)" ]]; then
+            echo "::notice::${NAME}@${VERSION} is already on npm - nothing to do."
+            exit 0
+          fi
+          # Without NPM_TOKEN, npm exchanges the OIDC token (trusted publishing).
+          if [[ -n "$NPM_TOKEN" ]]; then
+            export NPM_CONFIG_USERCONFIG="$RUNNER_TEMP/.npmrc"
+            # Single quotes on purpose: npm expands ${NPM_TOKEN} from the environment itself.
+            # shellcheck disable=SC2016
+            echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > "$NPM_CONFIG_USERCONFIG"
+          fi
+          # Already staged and waiting for approval (best effort: the listing may need a login).
+          if npm stage list "$NAME" 2>/dev/null | grep -qF "$VERSION"; then
+            echo "::notice::${NAME}@${VERSION} is already staged - approve it with: npm stage approve <stage-id>"
+            exit 0
+          fi
+          # npm refuses to publish a prerelease to the default `latest` dist-tag.
+          DIST_TAG=latest
+          [[ "$VERSION" == *-* ]] && DIST_TAG=next
+          # Staged publishing: the version waits on npm until a maintainer approves it with 2FA
+          # (npm stage approve, or the "Staged Packages" tab on npmjs.com). It is not public yet.
+          npm stage publish --access public --provenance --tag "$DIST_TAG"
+          {
+            echo "### 📦 ${NAME}@${VERSION} is staged on npm, not published yet"
+            echo
+            echo "Approve it (2FA required): \`npm stage list ${NAME}\` then \`npm stage approve <stage-id>\`,"
+            echo "or use the *Staged Packages* tab on https://www.npmjs.com/package/${NAME}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # version — commit the released version to package.json on the default branch (axnic-bot)
+  # ---------------------------------------------------------------------------
+  version:
+    name: 🏷️ Commit the version
+    needs: [prepare, npm]
+    # A prerelease (release candidate) never lands in package.json.
+    if: needs.prepare.outputs.prerelease != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # the push goes through the GitHub App token, not GITHUB_TOKEN
+
+    steps:
+      # The default branch is protected: only the axnic-bot app bypasses its ruleset.
+      - name: 🔎 Check the GitHub App credentials
+        env:
+          CI_APP_ID: ${{ secrets.CI_APP_ID }}
+          CI_APP_PRIVATE_KEY: ${{ secrets.CI_APP_PRIVATE_KEY }}
+        run: |
+          if [[ -z "$CI_APP_ID" || -z "$CI_APP_PRIVATE_KEY" ]]; then
+            echo "::error::CI_APP_ID / CI_APP_PRIVATE_KEY are not set: the version cannot be committed to the protected default branch. Install the axnic-bot GitHub App on this repository (or set npm_commit_version = false)."
+            exit 1
+          fi
+
+      - name: 🔑 Generate a GitHub App token
+        id: token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+        with:
+          app-id: ${{ secrets.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+
+      - name: ⬇️ Checkout the default branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          token: ${{ steps.token.outputs.token }}
+
+      - name: ✍️ Commit the version
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          MESSAGE_FORMAT: "=[repo]: Bump the package version to %s"
+          PACKAGE_DIR: .
+          BRANCH: main
+        run: |
+          cd "$PACKAGE_DIR"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          cd "$GITHUB_WORKSPACE"
+          if git diff --quiet; then
+            echo "::notice::package.json already says $VERSION - nothing to commit."
+            exit 0
+          fi
+          git config user.name "axnic-bot[bot]"
+          git config user.email "axnic-bot[bot]@users.noreply.github.com"
+          git commit --all --message "${MESSAGE_FORMAT//%s/$VERSION}"
+          # The branch may have moved since the checkout: replay the commit on top, a few times.
+          for attempt in 1 2 3; do
+            git push origin "HEAD:$BRANCH" && exit 0
+            git pull --rebase origin "$BRANCH"
+          done
+          echo "::error::Could not push the version commit to $BRANCH."
+          exit 1
