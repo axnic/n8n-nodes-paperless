@@ -1,0 +1,46 @@
+# =============================================================================
+# n8n-nodes-paperless — Development Environment
+# =============================================================================
+# The task names follow the axnic/.github contract, so the shared workflows run them as-is:
+#   https://github.com/axnic/.github/blob/main/docs/Mise-Tasks.md
+#
+# Tasks:
+#   ci:commitlint  — validate commit messages on a range (--from/--to or --last)
+#   ci:lint        — eslint, run by core.qa
+#   ci:build       — compile the node and copy its icons
+#   security:audit — audit the npm dependencies for known vulnerabilities
+#   ci             — local gate: ci:lint, then ci:build
+# =============================================================================
+
+[settings]
+experimental = true # required by [deps] below
+
+[tools]
+node = "lts"
+pnpm = "9"
+
+# `pnpm install` runs automatically before `mise run`.
+[deps.pnpm]
+auto = true
+
+[tasks."ci:commitlint"]
+description = "Validate commit messages (usage: mise run ci:commitlint -- --from <sha> --to <sha> | --last)"
+tools."npm:@commitlint/cli" = "latest"
+run = "commitlint --verbose"
+
+[tasks."ci:lint"]
+description = "Lint the node"
+run = "pnpm lint"
+
+[tasks."ci:build"]
+description = "Compile (tsc) the node and copy its icons"
+run = "pnpm build"
+
+[tasks."security:audit"]
+description = "Audit the npm dependencies"
+run = "pnpm audit --audit-level=high"
+
+[tasks.ci]
+description = "Local gate run before a release (lint, then build)"
+# Explicit order, not `depends` (parallel).
+run = [{ task = "ci:lint" }, { task = "ci:build" }]
