@@ -1,9 +1,14 @@
 # n8n-nodes-paperless
 
-![Paperless-ngx](https://raw.githubusercontent.com/axnic/n8n-nodes-paperless/refs/heads/main/nodes/Paperless/v2/paperless-ngx.svg)
+<!-- markdownlint-disable MD033 MD034 -->
+<img
+  src="https://raw.githubusercontent.com/axnic/n8n-nodes-paperless/refs/heads/main/nodes/Paperless/v2/paperless-ngx.svg"
+  alt="Paperless-ngx"
+  height="64"
+>
+<!-- markdownlint-enable MD033 MD034 -->
 
 [![QA](https://img.shields.io/github/actions/workflow/status/axnic/n8n-nodes-paperless/merge_group%2Cpull_request%2Cpush.qa.yaml?branch=main&label=QA)](https://github.com/axnic/n8n-nodes-paperless/actions/workflows/merge_group%2Cpull_request%2Cpush.qa.yaml)
-[![npm](https://img.shields.io/npm/v/%40n8n-chezmoi-sh%2Fn8n-nodes-paperless?label=npm)](https://www.npmjs.com/package/@n8n-chezmoi-sh/n8n-nodes-paperless)
 [![license](https://img.shields.io/github/license/axnic/n8n-nodes-paperless?label=license)](LICENSE.md)
 [![commits](https://img.shields.io/badge/commits-gitsym-blue)](https://github.com/axnic/gitsym)
 
