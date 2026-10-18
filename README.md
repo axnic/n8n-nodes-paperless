@@ -64,6 +64,25 @@ consumption task, and **Task > Get** tells you when Paperless-ngx has finished w
 Every operation returns its data under `results`, so the next node reads `{{ $json.results[0] }}` for a single
 object and `{{ $json.results }}` for a list.
 
+## Use as an AI tool
+
+The node is flagged `usableAsTool`, so it can be connected as a tool to the n8n **AI Agent** node. Through the
+**MCP Server Trigger** node, it is also exposed to any MCP client (Claude Desktop, Claude Code, Cursor...). One tool
+covers every resource and operation: they are fixed in the node, and the model only fills the other parameters.
+
+For a community node, n8n needs `N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true` on the instance.
+
+- To let the model fill a parameter, set the field to an expression such as
+  `{{ $fromAI('title', 'Title of the document', 'string') }}`, or use **Let the model define this parameter** in the
+  field's menu.
+- The `ID` fields default to **From List**, which a model cannot use. Switch them to **By ID** and give an expression,
+  e.g. `{{ $fromAI('id', 'ID of the document', 'number') }}`.
+- Operations that need or return binary data (**Document > Create**, **Document > Get preview**) make no sense for a
+  model: use them in regular workflows.
+
+For example, asked to "find the invoices from ACME of 2025", an agent uses **Document > List**, and
+**Tag** and **Correspondent** get/list to resolve the ids it filters on.
+
 ## Compatibility
 
 Built against `n8n-workflow` 2.16, for n8n 2.x. It needs Node.js 22 or later.
