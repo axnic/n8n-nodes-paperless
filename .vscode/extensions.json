@@ -2,7 +2,6 @@
 	"recommendations": [
 		"aaron-bond.better-comments",
 		"dbaeumer.vscode-eslint",
-		"EditorConfig.EditorConfig",
-		"Trunk.io"
+		"EditorConfig.EditorConfig"
 	]
 }
