@@ -18,7 +18,7 @@
 #   lint:fix        — same, and apply the available fixes
 #   ci:commitlint   — validate commit messages on a range (--from/--to or --last)
 #   ci:lint         — ESLint with the n8n community-package rules (core.qa)
-#   ci:build        — compile the node with tsc and copy its icons
+#   ci:build        — build the node with n8n-node (tsc + icons)
 #   ci:e2e <version> — end-to-end tests against a dockerized Paperless-ngx (needs Docker)
 #   ci:e2e:versions — the Paperless-ngx versions the end-to-end tests cover (e2e.sync)
 #   security:audit  — audit the npm dependencies for known vulnerabilities (security.audit)
@@ -112,7 +112,7 @@ depends = ["commitlint:link"]
 run = "commitlint --verbose"
 
 # -----------------------------------------------------------------------------
-# Build — tsc, then the icons (gulp). Not run by the shared workflows yet.
+# Build — `n8n-node build` (tsc, then copies the icons). Not run by the shared workflows yet.
 # -----------------------------------------------------------------------------
 
 [tasks."ci:build"]

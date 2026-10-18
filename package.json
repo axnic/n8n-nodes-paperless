@@ -22,15 +22,14 @@
 		"pnpm": ">=9.1"
 	},
 	"packageManager": "pnpm@9.15.4",
-	"main": "index.js",
 	"scripts": {
-		"preinstall": "npx only-allow pnpm",
-		"build": "tsc && gulp build:icons",
-		"dev": "tsc --watch",
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
 		"format": "prettier nodes credentials --write",
-		"lint": "eslint nodes credentials package.json",
-		"lintfix": "eslint nodes credentials package.json --fix",
-		"prepublishOnly": "pnpm build && pnpm lint -c .eslintrc.prepublish.js nodes credentials package.json"
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"prepublishOnly": "n8n-node prerelease"
 	},
 	"files": [
 		"dist"
@@ -42,14 +41,13 @@
 		],
 		"nodes": [
 			"dist/nodes/Paperless/Paperless.node.js"
-		]
+		],
+		"strict": false
 	},
 	"devDependencies": {
+		"@n8n/node-cli": "^0.52.5",
 		"@types/node": "^22.20.5",
-		"@typescript-eslint/parser": "^8.71.2",
-		"eslint": "^8.57.1",
-		"eslint-plugin-n8n-nodes-base": "^2.0.0",
-		"gulp": "^5.0.1",
+		"eslint": "^9.39.5",
 		"n8n-workflow": "^2.16.0",
 		"prettier": "^3.9.10",
 		"typescript": "^5.9.3"

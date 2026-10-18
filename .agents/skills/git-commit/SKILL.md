@@ -74,7 +74,7 @@ present, the scope must be in the `scope-enum` of `.commitlintrc.js`:
 | `n8n-node`    | The node itself: `nodes/` (resources, operations, router, transport, node.json) |
 | `document`    | The document and document-note resources (`nodes/Paperless/v2/actions/document*`) |
 | `credentials` | `credentials/`                                                                  |
-| `nodejs`      | Node/pnpm/TypeScript tooling: `package.json`, `tsconfig.json`, ESLint, gulp     |
+| `nodejs`      | Node/pnpm/TypeScript tooling: `package.json`, `tsconfig.json`, ESLint, n8n-node |
 | `mise`        | `mise.toml`                                                                     |
 | `rtunk`       | `.rtunk/`                                                                       |
 | `ci`          | `.github/workflows/`, `docker-compose.test.yml`, `tests/e2e/`                   |
