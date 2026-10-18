@@ -117,7 +117,7 @@ export async function execute(
 			: (typeof response)[K];
 	};
 
-	const options = this.getNodeParameter('options', itemIndex, null) as any;
+	const options = this.getNodeParameter('options', itemIndex, {}) as any;
 	if (options.use_metadata_values) {
 		const fetchMetadata = async (id: number, endpoint: string): Promise<string> => {
 			const response = (await apiRequest.call(this, itemIndex, 'GET', endpoint)) as any;
