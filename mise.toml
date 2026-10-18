@@ -19,7 +19,7 @@
 #   ci:commitlint   — validate commit messages on a range (--from/--to or --last)
 #   ci:lint         — ESLint with the n8n community-package rules (core.qa)
 #   ci:build        — compile the node with tsc and copy its icons
-#   ci:e2e          — end-to-end tests against a dockerized Paperless-ngx (E2E_VERSION, needs Docker)
+#   ci:e2e <version> — end-to-end tests against a dockerized Paperless-ngx (needs Docker)
 #   ci:e2e:versions — the Paperless-ngx versions the end-to-end tests cover (e2e.sync)
 #   security:audit  — audit the npm dependencies for known vulnerabilities (security.audit)
 #   ci              — local gate: ci:lint, then ci:build
@@ -121,16 +121,17 @@ run = "pnpm build"
 
 # -----------------------------------------------------------------------------
 # End-to-end tests — the compiled node against a real Paperless-ngx (docker-compose.test.yml), one
-# version per run: E2E_VERSION is the image tag. tests/e2e needs no dependency but Node and Docker.
+# version per run: the argument (or E2E_VERSION, which is what the central workflow sets) is the image tag. tests/e2e needs no dependency but Node and Docker.
 # The central e2e workflows run one caller per version listed by ci:e2e:versions.
 # -----------------------------------------------------------------------------
 
 [tasks."ci:e2e"]
-description = "Run the E2E tests against a dockerized Paperless-ngx (usage: E2E_VERSION=3.3.2 mise run ci:e2e)"
+description = "Run the E2E tests against a dockerized Paperless-ngx (usage: mise run ci:e2e 3.3.2)"
+# The version is the first argument; the central e2e workflow passes it as E2E_VERSION.
+usage = 'arg "<version>" env="E2E_VERSION" help="Paperless-ngx version (image tag), e.g. 3.3.2"'
 depends = ["ci:build"]
 run = '''
-: "${E2E_VERSION:?E2E_VERSION is required (e.g. 3.3.2)}"
-export PAPERLESS_VERSION="$E2E_VERSION"
+export PAPERLESS_VERSION="${usage_version?}"
 docker compose -f docker-compose.test.yml up --detach --wait
 status=0
 node --test 'tests/e2e/*.test.js' || status=$?
