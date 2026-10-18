@@ -57,5 +57,12 @@
 	},
 	"bugs": {
 		"url": "https://github.com/chezmoi-sh/n8n-nodes-paperless-ngx/issues"
+	},
+	"pnpm": {
+		"overrides": {
+			"handlebars": "^4.7.10",
+			"qs": "^6.16.0",
+			"stream-json": "^3.6.0"
+		}
 	}
 }
