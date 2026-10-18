@@ -18,7 +18,7 @@
 		"url": "https://github.com/chezmoi-sh/n8n-nodes-paperless-ngx.git"
 	},
 	"engines": {
-		"node": ">=18.10",
+		"node": ">=22.16",
 		"pnpm": ">=9.1"
 	},
 	"packageManager": "pnpm@9.15.4",
@@ -45,19 +45,18 @@
 		]
 	},
 	"devDependencies": {
-		"@types/node": "^18.10.0",
-		"@typescript-eslint/parser": "^7.18.0",
+		"@types/node": "^22.20.5",
+		"@typescript-eslint/parser": "^8.71.2",
 		"eslint": "^8.57.1",
-		"eslint-plugin-n8n-nodes-base": "^1.16.3",
-		"gulp": "^5.0.0",
-		"n8n-workflow": "^1.70.0",
-		"prettier": "^3.4.2",
-		"typescript": "^5.7.3"
+		"eslint-plugin-n8n-nodes-base": "^2.0.0",
+		"gulp": "^5.0.1",
+		"n8n-workflow": "^2.16.0",
+		"prettier": "^3.9.10",
+		"typescript": "^5.9.3"
 	},
 	"peerDependencies": {
 		"n8n-workflow": "*"
 	},
-	"dependencies": {},
 	"bugs": {
 		"url": "https://github.com/chezmoi-sh/n8n-nodes-paperless-ngx/issues"
 	}

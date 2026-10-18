@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
+import { IDataObject, IExecuteFunctions, INodeExecutionData, INodeProperties } from 'n8n-workflow';
 import { apiRequest } from '../../transport';
 
 export const description: INodeProperties[] = [
@@ -185,7 +185,7 @@ export async function execute(
 		? await this.helpers.getBinaryStream(binaryData.id)
 		: Buffer.from(binaryData.data, 'base64');
 
-	const formData: Record<string, unknown> = {
+	const formData: IDataObject = {
 		document: {
 			value: data,
 			options: {
