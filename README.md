@@ -4,8 +4,7 @@
 <img
   src="https://raw.githubusercontent.com/axnic/n8n-nodes-paperless-ngx/refs/heads/main/icons/paperless-ngx.svg"
   alt="Paperless-ngx"
-  height="64"
->
+  height="64">
 <!-- markdownlint-enable MD033 MD034 -->
 
 [![QA](https://img.shields.io/github/actions/workflow/status/axnic/n8n-nodes-paperless-ngx/merge_group%2Cpull_request%2Cpush.qa.yaml?branch=main&label=QA)](https://github.com/axnic/n8n-nodes-paperless-ngx/actions/workflows/merge_group%2Cpull_request%2Cpush.qa.yaml)
